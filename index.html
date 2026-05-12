@@ -6,8 +6,9 @@
 <title>Deploy & Chill — Tracker</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%23f59e0b'/><text x='16' y='22' text-anchor='middle' fill='%230f172a' font-size='16' font-weight='bold'>DC</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-storage-compat.js"></script>
 <style>
 :root {
   --bg: #0f172a;
@@ -206,6 +207,61 @@ body{background:var(--bg);color:var(--text-secondary);font-family:var(--sans);mi
   .budget-section{padding:0 14px}
   .event-info{padding:0 14px}
 }
+
+/* ── NOTES LOG ── */
+.notes-section{margin-top:16px;border-top:1px solid var(--border);padding-top:16px}
+.notes-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-dim);margin-bottom:12px;
+  display:flex;align-items:center;gap:6px}
+.notes-title span{font-family:var(--mono);font-size:10px;color:var(--text-faint);background:var(--bg-surface);padding:2px 6px;border-radius:4px}
+.notes-log{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+.note-entry{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px 14px;position:relative}
+.note-entry:hover .note-actions{opacity:1}
+.note-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.note-author{font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px}
+.note-author .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.note-time{font-size:11px;font-family:var(--mono);color:var(--text-faint)}
+.note-text{font-size:13px;color:var(--text-muted);line-height:1.6;white-space:pre-line;word-break:break-word}
+.note-actions{display:flex;gap:4px;opacity:0;transition:opacity .15s}
+.note-actions button{background:none;border:none;cursor:pointer;padding:4px 8px;border-radius:4px;font-size:11px;
+  font-family:var(--sans);color:var(--text-dim);transition:all .15s}
+.note-actions button:hover{background:var(--bg-surface);color:var(--text-muted)}
+.note-actions button.del:hover{color:var(--red)}
+.note-attachments{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.note-attach-img{width:80px;height:80px;object-fit:cover;border-radius:8px;border:1px solid var(--border);cursor:pointer;transition:transform .15s}
+.note-attach-img:hover{transform:scale(1.05)}
+.note-attach-file{display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;
+  background:var(--bg-surface);border:1px solid var(--border);font-size:12px;color:var(--text-muted);
+  text-decoration:none;transition:all .15s}
+.note-attach-file:hover{border-color:var(--amber);color:var(--text-secondary)}
+.note-attach-file svg{flex-shrink:0}
+.note-compose{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px 14px}
+.note-compose.editing{border-color:var(--amber)}
+.note-input{width:100%;padding:8px 0;border:none;background:none;color:var(--text-secondary);
+  font-size:13px;font-family:var(--sans);resize:none;min-height:40px;max-height:160px;outline:none;line-height:1.5}
+.note-input::placeholder{color:var(--text-faint)}
+.note-compose-bar{display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding-top:8px;
+  border-top:1px solid #1e293b;flex-wrap:wrap;gap:8px}
+.note-file-label{display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:6px;
+  background:var(--bg-surface);border:1px solid var(--border);font-size:12px;color:var(--text-muted);
+  cursor:pointer;transition:all .15s;font-family:var(--sans)}
+.note-file-label:hover{border-color:var(--text-dim);color:var(--text-secondary)}
+.note-file-label input{display:none}
+.note-compose-actions{display:flex;gap:6px;align-items:center}
+.note-pending-files{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.note-pending-file{display:flex;align-items:center;gap:4px;padding:4px 10px;border-radius:6px;
+  background:var(--amber-dim);font-size:11px;color:var(--amber);font-weight:500}
+.note-pending-file button{background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:14px;padding:0 2px}
+.btn-submit-note{padding:8px 18px;border-radius:8px;border:none;font-size:12px;font-weight:700;
+  cursor:pointer;font-family:var(--sans);background:var(--amber);color:var(--bg);transition:all .2s}
+.btn-submit-note:hover{background:#d97706}
+.btn-submit-note:disabled{opacity:0.4;cursor:not-allowed}
+.btn-cancel-note{padding:8px 14px;border-radius:8px;border:1px solid var(--border);background:none;
+  font-size:12px;font-weight:600;cursor:pointer;font-family:var(--sans);color:var(--text-dim);transition:all .15s}
+.btn-cancel-note:hover{border-color:var(--text-dim);color:var(--text-muted)}
+.note-uploading{font-size:11px;color:var(--amber);display:flex;align-items:center;gap:6px}
+.img-modal{position:fixed;inset:0;background:#000d;z-index:300;display:flex;align-items:center;
+  justify-content:center;cursor:pointer;padding:20px}
+.img-modal img{max-width:95%;max-height:95%;border-radius:8px;object-fit:contain}
 </style>
 </head>
 <body>
@@ -226,6 +282,7 @@ firebase.initializeApp({
   appId: "1:519569485617:web:df68b5546f36e463e84a10"
 });
 const db = firebase.database();
+const storage = firebase.storage();
 
 // ═══════════════════════════════════════════════════════════════
 // TASK DATA
@@ -440,12 +497,17 @@ let STATE = {
   expanded: {},
   taskData: {},
   budgetOpen: false,
+  editingNote: null, // { taskId, noteId }
+  pendingFiles: {},  // { taskId: [File, ...] }
+  uploading: false,
+  imageModal: null,
 };
 
 // ═══════════════════════════════════════════════════════════════
 // FIREBASE SYNC
 // ═══════════════════════════════════════════════════════════════
 const DB_BASE = "deploy_and_chill_2026";
+const STORAGE_BASE = "deploy_and_chill_2026";
 
 function initFirebase() {
   db.ref(DB_BASE + "/tasks").on("value", snap => {
@@ -463,13 +525,113 @@ function toggleTask(id) {
   });
 }
 
-let noteTimers = {};
-function updateNote(id, value) {
-  clearTimeout(noteTimers[id]);
-  noteTimers[id] = setTimeout(() => {
-    db.ref(DB_BASE + "/tasks/" + id).update({ notes: value });
-  }, 800);
+// ── NOTES CRUD ──
+async function submitNote(taskId) {
+  const textarea = document.getElementById("note-input-" + taskId);
+  const text = textarea?.value?.trim();
+  if (!text && !(STATE.pendingFiles[taskId]?.length)) return;
+
+  STATE.uploading = true;
+  render();
+
+  try {
+    let attachments = [];
+    const files = STATE.pendingFiles[taskId] || [];
+    for (const file of files) {
+      const ts = Date.now();
+      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+      const path = STORAGE_BASE + "/" + taskId + "/" + ts + "_" + safeName;
+      const ref = storage.ref(path);
+      await ref.put(file);
+      const url = await ref.getDownloadURL();
+      attachments.push({ name: file.name, url, type: file.type, path });
+    }
+
+    if (STATE.editingNote?.taskId === taskId) {
+      // Editing existing note
+      const noteId = STATE.editingNote.noteId;
+      const existing = STATE.taskData[taskId]?.notes?.[noteId];
+      const oldAttachments = existing?.attachments || [];
+      db.ref(DB_BASE + "/tasks/" + taskId + "/notes/" + noteId).update({
+        text: text || "",
+        editedAt: new Date().toISOString(),
+        attachments: [...oldAttachments, ...attachments]
+      });
+      STATE.editingNote = null;
+    } else {
+      // New note
+      const noteId = "n" + Date.now() + Math.random().toString(36).slice(2, 6);
+      db.ref(DB_BASE + "/tasks/" + taskId + "/notes/" + noteId).set({
+        text: text || "",
+        author: STATE.user,
+        timestamp: new Date().toISOString(),
+        attachments
+      });
+    }
+    STATE.pendingFiles[taskId] = [];
+  } catch (e) {
+    console.error("Error saving note:", e);
+    alert("Error al guardar. Intenta de nuevo.");
+  }
+  STATE.uploading = false;
+  render();
 }
+
+function startEditNote(taskId, noteId) {
+  STATE.editingNote = { taskId, noteId };
+  render();
+  setTimeout(() => {
+    const ta = document.getElementById("note-input-" + taskId);
+    if (ta) { ta.focus(); ta.selectionStart = ta.value.length; }
+  }, 50);
+}
+
+function cancelEdit(taskId) {
+  STATE.editingNote = null;
+  STATE.pendingFiles[taskId] = [];
+  render();
+}
+
+function deleteNote(taskId, noteId) {
+  if (!confirm("¿Eliminar esta nota?")) return;
+  const note = STATE.taskData[taskId]?.notes?.[noteId];
+  if (note?.attachments) {
+    note.attachments.forEach(att => {
+      if (att.path) storage.ref(att.path).delete().catch(() => {});
+    });
+  }
+  db.ref(DB_BASE + "/tasks/" + taskId + "/notes/" + noteId).remove();
+}
+
+function removeAttachment(taskId, noteId, idx) {
+  if (!confirm("¿Eliminar este archivo?")) return;
+  const note = STATE.taskData[taskId]?.notes?.[noteId];
+  if (!note?.attachments) return;
+  const att = note.attachments[idx];
+  if (att?.path) storage.ref(att.path).delete().catch(() => {});
+  const updated = [...note.attachments];
+  updated.splice(idx, 1);
+  db.ref(DB_BASE + "/tasks/" + taskId + "/notes/" + noteId).update({ attachments: updated });
+}
+
+function handleFileSelect(taskId, input) {
+  if (!input.files.length) return;
+  if (!STATE.pendingFiles[taskId]) STATE.pendingFiles[taskId] = [];
+  for (const f of input.files) {
+    if (f.size > 10 * 1024 * 1024) { alert(f.name + " excede 10MB"); continue; }
+    STATE.pendingFiles[taskId].push(f);
+  }
+  input.value = "";
+  render();
+}
+
+function removePendingFile(taskId, idx) {
+  STATE.pendingFiles[taskId].splice(idx, 1);
+  render();
+}
+
+function showImage(url) { STATE.imageModal = url; render(); }
+function closeImage() { STATE.imageModal = null; render(); }
 
 // ═══════════════════════════════════════════════════════════════
 // HELPERS
@@ -622,7 +784,7 @@ function render() {
     weekTasks.forEach(t => {
       const isDone = taskData[t.id]?.done || false;
       const isExp = expanded[t.id] || false;
-      const notes = taskData[t.id]?.notes || '';
+      const taskNotes = taskData[t.id]?.notes || {};
       const badge = taskBadge(t.due, isDone);
 
       html += `<div class="task ${isDone?'done':''} ${isExp?'expanded':''}">
@@ -644,7 +806,7 @@ function render() {
             <path d="M7 5l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </div>
-        ${isExp ? renderDetail(t, notes) : ''}
+        ${isExp ? renderDetail(t, taskNotes) : ''}
       </div>`;
     });
   });
@@ -677,36 +839,107 @@ function render() {
   // FOOTER
   html += `<div class="footer"><p>Deploy & Chill 2026 · Affinity Marketing International · Dirección de Desarrollo</p></div>`;
 
+  // IMAGE MODAL
+  if (STATE.imageModal) {
+    html += `<div style="position:fixed;inset:0;background:#000d;z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;cursor:pointer" onclick="closeImage()">
+      <img src="${STATE.imageModal}" style="max-width:90vw;max-height:90vh;border-radius:12px;box-shadow:0 8px 40px #0006" onclick="event.stopPropagation()" />
+      <button style="position:absolute;top:20px;right:24px;background:none;border:none;color:#fff;font-size:28px;cursor:pointer">✕</button>
+    </div>`;
+  }
+
   document.getElementById("app").innerHTML = html;
 }
 
 function renderDetail(t, notes) {
+  const isEditing = STATE.editingNote?.taskId === t.id;
+  const editNoteId = STATE.editingNote?.noteId;
+  const editNoteData = editNoteId ? notes[editNoteId] : null;
+  const pendingFiles = STATE.pendingFiles[t.id] || [];
+  const noteEntries = Object.entries(notes || {}).filter(([k]) => k.startsWith("n")).sort((a,b) => (a[1].timestamp||"") > (b[1].timestamp||"") ? 1 : -1);
+  const authorName = (a) => a === "yosh" ? "Josué Ubico" : a === "audelina" ? "Audelina Najera" : a || "—";
+  const fmtTs = (ts) => { try { return new Date(ts).toLocaleDateString("es",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}) } catch { return ts } };
+  const isImage = (type) => type && type.startsWith("image/");
+
   let html = '<div class="task-detail">';
 
   if (t.desc) {
-    html += `<div class="task-desc">${t.desc}</div>`;
+    html += '<div class="task-desc">' + t.desc + '</div>';
   }
 
   if (t.script) {
-    html += `<div class="task-script">
-      <div class="task-script-title">Qué decir al llamar</div>
-      <div class="task-script-body">"${esc(t.script)}"</div>
-    </div>`;
+    html += '<div class="task-script"><div class="task-script-title">Qué decir al llamar</div><div class="task-script-body">"' + esc(t.script) + '"</div></div>';
   }
 
   if (t.questions && t.questions.length) {
-    html += `<div class="task-questions">
-      <div class="task-questions-title">Preguntas que debe hacer (anotar cada respuesta)</div>
-      <ol>${t.questions.map(q => `<li>${esc(q)}</li>`).join('')}</ol>
-    </div>`;
+    html += '<div class="task-questions"><div class="task-questions-title">Preguntas que debe hacer (anotar cada respuesta)</div><ol>' + t.questions.map(function(q){ return '<li>' + esc(q) + '</li>' }).join('') + '</ol></div>';
   }
 
-  html += `<div class="task-notes-wrap">
-    <div class="task-notes-label">Notas y observaciones</div>
-    <textarea class="task-notes" placeholder="Agrega notas aquí..." oninput="updateNote('${t.id}',this.value)">${esc(notes)}</textarea>
-  </div>`;
+  // ── BITÁCORA ──
+  html += '<div class="task-notes-wrap"><div class="task-notes-label">Bitácora</div>';
 
-  html += '</div>';
+  // Existing notes
+  if (noteEntries.length) {
+    noteEntries.forEach(function(entry) {
+      var nId = entry[0], n = entry[1];
+      var isAuthorY = n.author === "yosh";
+      var dotColor = isAuthorY ? "var(--amber)" : "var(--emerald)";
+      html += '<div class="note-entry"><div class="note-entry-header">';
+      html += '<div class="note-author"><span class="note-dot" style="background:' + dotColor + '"></span>';
+      html += '<span class="note-author-name">' + esc(authorName(n.author)) + '</span>';
+      html += '<span class="note-time">' + fmtTs(n.timestamp) + '</span>';
+      if (n.editedAt) html += '<span class="note-time">(editada)</span>';
+      html += '</div>';
+      html += '<div class="note-actions">';
+      html += '<button class="edit" onclick="event.stopPropagation();startEditNote(\'' + t.id + '\',\'' + nId + '\')" title="Editar">✎</button>';
+      html += '<button class="del" onclick="event.stopPropagation();deleteNote(\'' + t.id + '\',\'' + nId + '\')" title="Eliminar">✕</button>';
+      html += '</div></div>';
+      if (n.text) html += '<div class="note-text">' + esc(n.text) + '</div>';
+      if (n.attachments && n.attachments.length) {
+        html += '<div class="note-attachments">';
+        n.attachments.forEach(function(att, idx) {
+          if (isImage(att.type)) {
+            html += '<img class="note-attach-img" src="' + att.url + '" alt="' + esc(att.name) + '" onclick="event.stopPropagation();showImage(\'' + att.url + '\')" />';
+          } else {
+            html += '<a class="note-attach-file" href="' + att.url + '" target="_blank" rel="noopener" onclick="event.stopPropagation()">';
+            html += '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 1h5l4 4v8H3V1z" stroke="currentColor" stroke-width="1.5"/><path d="M8 1v4h4" stroke="currentColor" stroke-width="1.5"/></svg>';
+            html += esc(att.name) + '</a>';
+          }
+        });
+        html += '</div>';
+      }
+      html += '</div>';
+    });
+  }
+
+  // Compose area
+  html += '<div class="note-compose ' + (isEditing ? "editing" : "") + '">';
+  html += '<textarea id="note-input-' + t.id + '" class="note-input" placeholder="' + (isEditing ? 'Editando nota...' : 'Escribe una nota, observación o adjunta un archivo...') + '" onclick="event.stopPropagation()">' + (isEditing && editNoteData ? esc(editNoteData.text || "") : "") + '</textarea>';
+
+  // Pending files preview
+  if (pendingFiles.length) {
+    html += '<div class="note-pending-files">';
+    pendingFiles.forEach(function(f, idx) {
+      html += '<span class="note-pending-file">' + esc(f.name) + '<button onclick="event.stopPropagation();removePendingFile(\'' + t.id + '\',' + idx + ')">✕</button></span>';
+    });
+    html += '</div>';
+  }
+
+  html += '<div class="note-compose-bar">';
+  html += '<label class="note-file-label" onclick="event.stopPropagation()">';
+  html += '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg> Adjuntar';
+  html += '<input type="file" multiple accept="image/*,.pdf,.doc,.docx,.xlsx,.xls" onchange="handleFileSelect(\'' + t.id + '\',this)" />';
+  html += '</label>';
+  html += '<div class="note-compose-actions">';
+  if (isEditing) {
+    html += '<button class="btn-cancel-note" onclick="event.stopPropagation();cancelEdit(\'' + t.id + '\')">Cancelar</button>';
+  }
+  html += '<button class="btn-submit-note" onclick="event.stopPropagation();submitNote(\'' + t.id + '\')"' + (STATE.uploading ? ' disabled' : '') + '>';
+  html += STATE.uploading ? 'Guardando...' : (isEditing ? 'Actualizar' : 'Guardar');
+  html += '</button>';
+  html += '</div></div></div>';
+
+  html += '</div>'; // task-notes-wrap
+  html += '</div>'; // task-detail
   return html;
 }
 
