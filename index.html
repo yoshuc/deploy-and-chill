@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deploy & Chill — Tracker</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%23f59e0b'/><text x='16' y='22' text-anchor='middle' fill='%230f172a' font-size='16' font-weight='bold'>DC</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<style>
+:root {
+  --bg: #0f172a;
+  --bg-card: #1e293b;
+  --bg-surface: #273449;
+  --border: #334155;
+  --border-light: #3e4f68;
+  --text: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  --text-dim: #64748b;
+  --text-faint: #475569;
+  --amber: #f59e0b;
+  --amber-dim: #f59e0b20;
+  --emerald: #10b981;
+  --emerald-dim: #10b98118;
+  --red: #ef4444;
+  --red-dim: #ef444418;
+  --sans: 'DM Sans', system-ui, sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text-secondary);font-family:var(--sans);min-height:100vh;-webkit-font-smoothing:antialiased}
+::selection{background:var(--amber);color:var(--bg)}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+/* ── LOGIN ── */
+.login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;
+  background:linear-gradient(160deg,#0f172a 0%,#0c1322 50%,#111827 100%)}
+.login-box{max-width:400px;width:100%;text-align:center}
+.login-logo{font-size:13px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--amber);margin-bottom:8px}
+.login-title{font-size:32px;font-weight:800;color:var(--text);margin-bottom:6px;letter-spacing:-0.5px}
+.login-sub{font-size:14px;color:var(--text-dim);margin-bottom:40px;line-height:1.5}
+.login-label{font-size:12px;font-weight:600;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:16px;display:block}
+.login-btns{display:flex;flex-direction:column;gap:10px}
+.login-btn{padding:18px 24px;border-radius:12px;border:2px solid var(--border);background:var(--bg-card);color:var(--text);
+  font-size:15px;font-weight:600;cursor:pointer;transition:all .25s;font-family:var(--sans);text-align:left;
+  display:flex;align-items:center;gap:14px}
+.login-btn:hover{border-color:var(--amber);background:var(--bg-surface);transform:translateY(-1px)}
+.login-btn .avatar{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;
+  font-size:16px;font-weight:800;color:var(--bg);flex-shrink:0}
+.login-btn .avatar.y{background:var(--amber)}
+.login-btn .avatar.a{background:var(--emerald)}
+.login-btn .role{font-size:12px;color:var(--text-dim);font-weight:400;margin-top:2px}
+
+/* ── TOPBAR ── */
+.topbar{background:var(--bg-card);border-bottom:1px solid var(--border);padding:14px 20px;
+  display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:50;
+  backdrop-filter:blur(12px);flex-wrap:wrap;gap:10px}
+.topbar-left{display:flex;align-items:center;gap:12px}
+.topbar-logo{width:36px;height:36px;border-radius:9px;background:var(--amber);display:flex;align-items:center;
+  justify-content:center;font-size:13px;font-weight:800;color:var(--bg);flex-shrink:0;letter-spacing:-0.5px}
+.topbar-text .ev-name{font-size:17px;font-weight:800;color:var(--text);letter-spacing:-0.3px}
+.topbar-text .ev-date{font-size:12px;color:var(--text-dim);font-family:var(--mono)}
+.topbar-right{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.topbar-user{display:flex;align-items:center;gap:8px;padding:6px 14px;border-radius:8px;
+  background:var(--bg-surface);font-size:13px;color:var(--text-muted);font-weight:500}
+.topbar-user .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.btn-logout{background:none;border:1px solid var(--border);border-radius:8px;padding:6px 14px;
+  font-size:12px;color:var(--text-dim);cursor:pointer;font-family:var(--sans);transition:all .2s}
+.btn-logout:hover{border-color:var(--text-dim);color:var(--text-muted)}
+
+/* ── PROGRESS GLOBAL ── */
+.progress-global{padding:16px 20px;background:var(--bg);border-bottom:1px solid var(--border)}
+.progress-row{display:flex;gap:16px;max-width:800px;margin:0 auto;flex-wrap:wrap}
+.progress-item{flex:1;min-width:140px}
+.progress-item .label{font-size:11px;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.progress-item .bar-wrap{height:6px;background:var(--bg-surface);border-radius:3px;overflow:hidden;margin-bottom:4px}
+.progress-item .bar-fill{height:100%;border-radius:3px;transition:width .6s}
+.progress-item .bar-fill.amber{background:var(--amber)}
+.progress-item .bar-fill.emerald{background:var(--emerald)}
+.progress-item .pct{font-size:12px;font-weight:700;font-family:var(--mono);color:var(--text-muted)}
+
+/* ── TABS ── */
+.tabs-wrap{max-width:800px;margin:0 auto;padding:20px 20px 0;display:flex;gap:6px}
+.tab-btn{padding:10px 22px;border-radius:10px 10px 0 0;border:1px solid var(--border);border-bottom:none;
+  font-size:13px;font-weight:700;cursor:pointer;background:var(--bg);color:var(--text-dim);
+  transition:all .2s;font-family:var(--sans);position:relative}
+.tab-btn.active{background:var(--bg-card);color:var(--text);border-color:var(--border)}
+.tab-btn .tab-count{font-size:11px;font-family:var(--mono);margin-left:6px;padding:2px 7px;
+  border-radius:10px;background:var(--bg-surface);color:var(--text-dim)}
+.tab-btn.active .tab-count{background:var(--amber-dim);color:var(--amber)}
+
+/* ── CONTAINER ── */
+.container{max-width:800px;margin:0 auto;padding:0 20px 40px}
+.checklist-wrap{background:var(--bg-card);border:1px solid var(--border);border-radius:0 12px 12px 12px;min-height:300px}
+
+/* ── WEEK HEADER ── */
+.week-header{padding:16px 20px 8px;display:flex;justify-content:space-between;align-items:center;
+  border-bottom:1px solid var(--border)}
+.week-header .week-title{font-size:13px;font-weight:700;color:var(--text);letter-spacing:0.5px}
+.week-header .week-title span{color:var(--text-dim);font-weight:500;margin-left:6px}
+.week-header .week-count{font-size:11px;font-family:var(--mono);color:var(--text-dim)}
+.week-current{border-left:3px solid var(--amber);background:var(--amber-dim)}
+
+/* ── TASK ROW ── */
+.task{border-bottom:1px solid #1e293b;transition:background .15s}
+.task:last-child{border-bottom:none}
+.task:hover{background:#ffffff04}
+.task-main{display:flex;align-items:flex-start;gap:12px;padding:14px 20px;cursor:pointer}
+.task-check{width:22px;height:22px;border-radius:6px;border:2px solid var(--border);flex-shrink:0;
+  margin-top:1px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;
+  background:none}
+.task-check:hover{border-color:var(--amber)}
+.task-check.done{background:var(--emerald);border-color:var(--emerald)}
+.task-check.done svg{opacity:1}
+.task-check svg{opacity:0;transition:opacity .15s}
+.task-body{flex:1;min-width:0}
+.task-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.task-code{font-size:11px;font-weight:700;font-family:var(--mono);color:var(--amber);
+  background:var(--amber-dim);padding:2px 8px;border-radius:4px;flex-shrink:0}
+.task-title{font-size:14px;font-weight:600;color:var(--text-secondary);line-height:1.4}
+.task.done .task-title{color:var(--text-dim);text-decoration:line-through;text-decoration-color:var(--text-faint)}
+.task-meta{display:flex;gap:10px;margin-top:4px;align-items:center;flex-wrap:wrap}
+.task-date{font-size:12px;font-family:var(--mono);color:var(--text-dim)}
+.task-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px}
+.badge-overdue{background:var(--red-dim);color:var(--red)}
+.badge-soon{background:var(--amber-dim);color:var(--amber)}
+.badge-done{background:var(--emerald-dim);color:var(--emerald)}
+.task-chevron{color:var(--text-faint);flex-shrink:0;transition:transform .2s;margin-top:2px}
+.task.expanded .task-chevron{transform:rotate(90deg)}
+
+/* ── TASK DETAIL ── */
+.task-detail{padding:0 20px 16px 54px;display:none}
+.task.expanded .task-detail{display:block;animation:slideDown .2s ease}
+@keyframes slideDown{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+.task-desc{font-size:13px;color:var(--text-muted);line-height:1.7;margin-bottom:12px;white-space:pre-line}
+.task-desc strong{color:var(--text-secondary);font-weight:600}
+.task-script{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px 16px;
+  margin-bottom:12px}
+.task-script-title{font-size:11px;font-weight:700;color:var(--amber);text-transform:uppercase;
+  letter-spacing:1px;margin-bottom:8px}
+.task-script-body{font-size:13px;color:var(--text-muted);line-height:1.7;white-space:pre-line}
+.task-questions{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px 16px;
+  margin-bottom:12px}
+.task-questions-title{font-size:11px;font-weight:700;color:var(--emerald);text-transform:uppercase;
+  letter-spacing:1px;margin-bottom:8px}
+.task-questions ol{padding-left:18px;font-size:13px;color:var(--text-muted);line-height:1.8}
+.task-questions li{margin-bottom:2px}
+.task-notes-wrap{margin-top:12px}
+.task-notes-label{font-size:11px;font-weight:600;color:var(--text-dim);text-transform:uppercase;
+  letter-spacing:1px;margin-bottom:6px}
+.task-notes{width:100%;padding:10px 14px;border-radius:8px;border:1px solid var(--border);
+  background:var(--bg);color:var(--text-secondary);font-size:13px;font-family:var(--sans);
+  resize:vertical;min-height:44px;max-height:200px;outline:none;transition:border-color .2s}
+.task-notes:focus{border-color:var(--amber)}
+.task-notes::placeholder{color:var(--text-faint)}
+
+/* ── BUDGET ── */
+.budget-section{max-width:800px;margin:24px auto 40px;padding:0 20px}
+.budget-toggle{width:100%;padding:14px 20px;border-radius:12px;border:1px solid var(--border);
+  background:var(--bg-card);color:var(--text);font-size:14px;font-weight:700;cursor:pointer;
+  font-family:var(--sans);display:flex;justify-content:space-between;align-items:center;transition:all .2s}
+.budget-toggle:hover{border-color:var(--border-light)}
+.budget-toggle .budget-total{font-family:var(--mono);color:var(--amber)}
+.budget-body{background:var(--bg-card);border:1px solid var(--border);border-top:none;
+  border-radius:0 0 12px 12px;padding:16px 20px;display:none}
+.budget-body.open{display:block}
+.budget-table{width:100%;border-collapse:collapse}
+.budget-table th{text-align:left;font-size:11px;font-weight:700;color:var(--text-dim);
+  text-transform:uppercase;letter-spacing:1px;padding:8px 0;border-bottom:1px solid var(--border)}
+.budget-table th:nth-child(2),.budget-table th:nth-child(3){text-align:right}
+.budget-table td{padding:8px 0;font-size:13px;color:var(--text-muted);border-bottom:1px solid #1e293b}
+.budget-table td:nth-child(2),.budget-table td:nth-child(3){text-align:right;font-family:var(--mono);font-size:12px}
+.budget-table tr:last-child td{border-bottom:none;font-weight:700;color:var(--text);padding-top:12px}
+.budget-table .sobrante{color:var(--emerald)}
+
+/* ── EVENT INFO ── */
+.event-info{max-width:800px;margin:20px auto 0;padding:0 20px}
+.event-card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:20px}
+.event-card h3{font-size:14px;font-weight:700;color:var(--text);margin-bottom:12px}
+.agenda-row{display:flex;gap:12px;padding:6px 0;border-bottom:1px solid #1e293b;font-size:13px}
+.agenda-row:last-child{border-bottom:none}
+.agenda-time{font-family:var(--mono);color:var(--amber);font-size:12px;font-weight:600;
+  min-width:54px;flex-shrink:0}
+.agenda-what{color:var(--text-muted)}
+
+/* ── FOOTER ── */
+.footer{max-width:800px;margin:0 auto;padding:20px;text-align:center}
+.footer p{font-size:11px;color:var(--text-faint)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:640px){
+  .topbar{padding:12px 14px}
+  .topbar-text .ev-name{font-size:15px}
+  .progress-row{flex-direction:column;gap:10px}
+  .tabs-wrap{padding:16px 14px 0}
+  .container{padding:0 14px 32px}
+  .task-main{padding:12px 14px}
+  .task-detail{padding:0 14px 14px 44px}
+  .people-grid{grid-template-columns:1fr}
+  .login-title{font-size:26px}
+  .login-btn{padding:14px 18px}
+  .budget-section{padding:0 14px}
+  .event-info{padding:0 14px}
+}
+</style>
+</head>
+<body>
+
+<div id="app"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// FIREBASE INIT
+// ═══════════════════════════════════════════════════════════════
+firebase.initializeApp({
+  apiKey: "AIzaSyAuFNgFgicmeqzsYOnr5FolTvT0kDKkyes",
+  authDomain: "deploy-and-chill.firebaseapp.com",
+  databaseURL: "https://deploy-and-chill-default-rtdb.firebaseio.com",
+  projectId: "deploy-and-chill",
+  storageBucket: "deploy-and-chill.firebasestorage.app",
+  messagingSenderId: "519569485617",
+  appId: "1:519569485617:web:df68b5546f36e463e84a10"
+});
+const db = firebase.database();
+
+// ═══════════════════════════════════════════════════════════════
+// TASK DATA
+// ═══════════════════════════════════════════════════════════════
+const TASKS = {
+  yosh: [
+    // SEMANA 1
+    { id:"Y-01", week:1, title:"Cerrar la encuesta y documentar resultados",
+      due:"2026-05-12",
+      desc:"Cerrar el Google Form. Exportar resultados y documentar:\n• Tipo de actividad ganadora\n• Comida preferida\n• Bebida preferida\n• Día ganador\n• Restricciones alimentarias\n• Cuántos tomarán alcohol vs. no\n\nEstos datos alimentan todas las decisiones de Audelina con los venues." },
+
+    { id:"Y-02", week:1, title:"Dar briefing completo a Audelina",
+      due:"2026-05-12",
+      desc:"Sentarse con Audelina (30 min). Explicarle el concepto del evento, entregarle el plan maestro impreso o digital, y revisar juntos su checklist punto por punto.\n\nAsegurarse de que entienda qué debe preguntar y validar con cada venue. Si Audelina no tiene claro el alcance, las cotizaciones van a venir incompletas." },
+
+    { id:"Y-03", week:1, title:"Decidir el regalo personalizado y ordenar producción",
+      due:"2026-05-16",
+      desc:"Elegir entre las opciones de regalo. Buscar proveedor, pedir muestra si es posible, aprobar diseño, ordenar 25 unidades + 2 extras.\n\n<strong>Opciones evaluadas:</strong>\n• Camiseta negra \"Deploy & Chill 2026\" — Q60–100/pp, 10–14 días\n• Tumbler/botella térmica grabado láser — Q80–120/pp, 7–10 días\n• Kit dev (mousepad + stickers + pin) — Q70–100/pp, 7–10 días\n• Hoodie zip negro con bordado — Q120–180/pp, 14–18 días\n\n<strong>Nota:</strong> Si eliges camiseta o hoodie, necesitas recopilar tallas. Puedes pedirle a Audelina que lo pregunte por WhatsApp." },
+
+    // SEMANA 2
+    { id:"Y-04", week:2, title:"Decidir los premios del torneo",
+      due:"2026-05-23",
+      desc:"Comprar premios para las categorías:\n\n🏆 <strong>Equipo campeón (4–5 personas):</strong> Gift card individual Q150 (Amazon, Uber Eats, o tienda tech) → Q600–750 total\n🥈 <strong>Segundo lugar:</strong> Gift card individual Q75 → Q300–375 total\n🎯 <strong>MVP (mejor score individual):</strong> Audífonos bluetooth o power bank premium → Q200–300\n😂 <strong>\"404: Pins Not Found\" (último lugar):</strong> Trofeo chistoso o camiseta → Q50–100\n\nTotal estimado en premios: Q1,150–1,525" },
+
+    { id:"Y-05", week:2, title:"Diseñar la invitación digital",
+      due:"2026-05-16",
+      desc:"Crear imagen para WhatsApp/correo en Canva (1600×400px para header, o formato vertical para WhatsApp).\n\n<strong>Debe incluir:</strong>\n• Nombre: Deploy & Chill\n• Fecha: Jueves 4 de junio\n• Hora: 11:00 AM\n• Lugar: CC La Estación, Zona 10\n• Dress code: Casual\n• Incluye almuerzo y bebidas\n• \"Confirma tu asistencia con Audelina\"" },
+
+    { id:"Y-06", week:2, title:"Crear la web app del torneo de boliche",
+      due:"2026-05-28",
+      desc:"Funcionalidades requeridas:\n• Registro de asistentes el día del evento\n• Generador aleatorio de equipos con nombres temáticos\n• Formato flexible: arma equipos de 4–5 personas según asistentes reales\n• Bracket visual del torneo (automático según cantidad de equipos)\n• Input de scores por ronda desde celular\n• Leaderboard en tiempo real\n• Pantalla de resultados finales (campeón, MVP, \"404 Pins Not Found\")" },
+
+    { id:"Y-07", week:2, title:"Enviar invitación oficial al equipo",
+      due:"2026-05-19",
+      desc:"Canal: WhatsApp grupal + correo electrónico.\n\n<strong>Mensaje sugerido:</strong>\n\"Equipo 🚀 El próximo jueves 4 de junio tenemos un Deploy & Chill — un día fuera de código para todo el equipo GT. Incluye torneo de boliche con premios, almuerzo premium con cortes de carne, y bebidas. Lugar: CC La Estación, Z10. Hora: 11:00 AM. Dress code: casual. Confirma tu asistencia con Audelina antes del viernes 23 de mayo.\"" },
+
+    { id:"Y-08", week:2, title:"Validar cotizaciones de Audelina",
+      due:"2026-05-21",
+      desc:"Revisar las cotizaciones que Audelina consiguió de Futeca y Palermo. Verificar que los números cuadren con el presupuesto de USD $2,500. Aprobar o pedir ajustes." },
+
+    { id:"Y-09", week:2, title:"Aprobar menú final del restaurante",
+      due:"2026-05-23",
+      desc:"Revisar las opciones de menú que Audelina negoció con Palermo. Verificar que haya opciones sin azúcar. Aprobar el menú fijo." },
+
+    // SEMANA 3
+    { id:"Y-10", week:3, title:"Revisar confirmaciones de asistencia",
+      due:"2026-05-26",
+      desc:"Revisar la lista de confirmados que Audelina recopiló. Identificar quién no ha respondido y hacer follow-up personal si es necesario." },
+
+    { id:"Y-11", week:3, title:"Recoger y verificar regalos",
+      due:"2026-05-30",
+      desc:"Recoger los regalos del proveedor. Verificar cantidad (25 + 2 extras), calidad de impresión/grabado, y que todo esté en orden." },
+
+    { id:"Y-12", week:3, title:"Comprar premios del torneo",
+      due:"2026-05-30",
+      desc:"Si aún no se han adquirido los premios definidos en Y-04, comprarlos esta semana. Tener todo empacado y listo." },
+
+    // SEMANA 4
+    { id:"Y-13", week:4, title:"Probar la web app del torneo",
+      due:"2026-06-03",
+      desc:"Cargar datos de prueba, simular un torneo completo, verificar que funcione bien en celular. Probar en al menos 2 navegadores diferentes." },
+
+    { id:"Y-14", week:4, title:"Preparar todo la noche anterior",
+      due:"2026-06-03",
+      desc:"Empacar regalos, premios, cualquier material. Verificar que el celular tenga batería y la web app cargada. Confirmar hora de llegada con Audelina (10:30 AM en La Estación)." },
+  ],
+
+  audelina: [
+    // SEMANA 1
+    { id:"A-01", week:1, title:"Llamar a Futeca Bowling — cotizar evento corporativo",
+      due:"2026-05-12",
+      desc:"Contacto: WhatsApp +502 3758-6118\nUbicación: CC La Estación, La Terraza, 2do nivel, Zona 10",
+      script:"Buenos días, les llamo de parte de Affinity Marketing International. Estamos organizando un evento corporativo de team building para 25 personas el jueves 4 de junio. Nos gustaría cotizar un paquete para un torneo de boliche de aproximadamente 2 a 2.5 horas, con snacks y bebidas. ¿Manejan paquetes corporativos?",
+      questions:[
+        "¿Tienen disponibilidad el jueves 4 de junio de 11:00 AM a 1:30 PM?",
+        "¿Cuántas pistas pueden reservarnos? Necesitamos mínimo 5 pistas (5 personas por pista). ¿Pueden reservar un bloque contiguo o área exclusiva?",
+        "¿Cuánto cuesta la hora por pista entre semana? ¿Precio especial para grupos/corporativos?",
+        "¿El alquiler de zapatos está incluido o es aparte? ¿Cuánto cuesta por persona?",
+        "¿Podemos reservar por 2.5 horas corridas? ¿O cobran por hora exacta?",
+        "¿Qué opciones de comida tienen para servir durante el boliche? ¿Pueden armar un paquete de snacks para 25 personas (pizzas + nachos + gaseosas)? ¿Cuánto costaría?",
+        "¿Venden cerveza y tragos? ¿Manejan cuenta abierta con tope? ¿Permiten llevar bebidas propias (descorche)?",
+        "¿Tienen un paquete todo incluido (pistas + snacks + bebidas) con precio por persona?",
+        "¿Requieren depósito para reservar? ¿Cuánto? ¿Política de cancelación?",
+        "¿Hay una persona específica que maneje eventos corporativos? Nombre y contacto directo.",
+        "¿Tienen pantallas donde se pueda proyectar algo? ¿Se puede poner música propia?",
+        "¿El parqueo del centro comercial es gratuito o tiene costo?"
+      ]},
+
+    { id:"A-02", week:1, title:"Llamar a Restaurante Palermo — cotizar almuerzo grupal",
+      due:"2026-05-13",
+      desc:"Contacto: Tel +502 5563-8278\nUbicación: CC La Estación, Zona 10 (mismo centro comercial que el boliche)",
+      script:"Buenos días, les llamo de parte de Affinity Marketing International. Estamos organizando un almuerzo corporativo para 25 personas el jueves 4 de junio, aproximadamente de 1:30 PM a 4:00 PM. Nos interesa un menú fijo con cortes de carne. ¿Manejan eventos para grupos?",
+      questions:[
+        "¿Tienen disponibilidad el jueves 4 de junio de 1:30 PM a 4:00 PM para 25 personas?",
+        "¿Pueden reservarnos un área separada o semi-privada? ¿O estaríamos en el salón general?",
+        "¿Manejan menú fijo para eventos? ¿Qué opciones tienen? Necesitamos cortes de carne como plato principal.",
+        "¿Pueden ofrecer 2–3 opciones de plato principal para que cada persona elija (carne, pollo, pescado)?",
+        "Tenemos personas con control de azúcar. ¿Pueden ofrecer postres sin azúcar o sustituir por fruta?",
+        "¿Cuánto cuesta el menú fijo por persona? ¿Qué incluye exactamente (entrada, plato fuerte, postre, bebida)?",
+        "¿Manejan cuenta abierta de bar? ¿Cuánto cuesta agregar bebidas alcohólicas al paquete?",
+        "¿Permiten llevar vino propio (BYO)? Si sí, ¿cuánto cobran de descorche por botella?",
+        "¿Qué cervezas manejan? ¿Tienen cerveza artesanal? ¿Precio por unidad?",
+        "¿Hay límite de tiempo para el grupo? ¿Podemos quedarnos hasta las 4:00–4:30 PM?",
+        "¿Requieren depósito? ¿Cuánto? ¿Política de cancelación?",
+        "Si confirmamos 25 pero llegan 22, ¿se cobra por los 25 o por los que asistan? ¿Hasta cuándo podemos ajustar el número?",
+        "Nombre y contacto directo de la persona que coordina eventos.",
+        "¿Se puede colocar decoración en la mesa? ¿Permiten música o bocina bluetooth?"
+      ]},
+
+    { id:"A-03", week:1, title:"Backup: cotizar Arena Mediterránea (solo si Palermo no funciona)",
+      due:"2026-05-14",
+      desc:"<strong>Solo ejecutar si Palermo no tiene disponibilidad o Yosh lo indica.</strong>\n\nBuscar contacto en redes @arena_mediterranea o llamar a CC La Estación.\nHacer las mismas 14 preguntas del punto A-02." },
+
+    // SEMANA 2
+    { id:"A-04", week:2, title:"Dar seguimiento a cotizaciones pendientes",
+      due:"2026-05-19",
+      desc:"Si para esta fecha no han llegado las cotizaciones escritas de Futeca o Palermo, llamar de nuevo y pedir que las envíen por WhatsApp o correo.\n\n<strong>No dejar pasar más de una semana sin cotización en mano.</strong>" },
+
+    { id:"A-05", week:2, title:"Recopilar confirmaciones de asistencia del equipo",
+      due:"2026-05-23",
+      desc:"Después de que Yosh envíe la invitación (lunes 19), llevar el control de quién confirma.\n\n<strong>Crear una lista con 3 columnas:</strong>\n• Nombre\n• ¿Confirma? (Sí / No / No ha respondido)\n• Restricción alimentaria (si aplica)\n\nEl viernes 23 enviarle a Yosh la lista con el conteo: X confirmados, X pendientes, X no asisten.\n\nSi alguien no ha respondido para el viernes 23, enviarle mensaje directo por WhatsApp." },
+
+    { id:"A-06", week:2, title:"Recopilar tallas del equipo (si aplica)",
+      due:"2026-05-21",
+      desc:"<strong>Solo si Yosh elige camiseta o hoodie como regalo.</strong>\n\nEnviar mensaje por WhatsApp a cada persona preguntando su talla (S, M, L, XL, XXL).\n\nConsolidar en una lista y enviar a Yosh antes del jueves 22." },
+
+    { id:"A-07", week:2, title:"Confirmar menú final con Palermo",
+      due:"2026-05-21",
+      desc:"Una vez que Yosh apruebe la cotización, llamar a Palermo y confirmar:\n\n• Menú fijo aprobado por Yosh\n• Cantidad de personas con restricciones alimentarias\n• Hora exacta de llegada del grupo (1:30 PM)\n• Forma de pago (tarjeta corporativa, transferencia, o efectivo)\n\n<strong>Pedir confirmación por escrito de todo lo anterior.</strong>" },
+
+    // SEMANA 3
+    { id:"A-08", week:3, title:"Confirmar reserva del boliche con headcount actualizado",
+      due:"2026-05-26",
+      desc:"Llamar a Futeca y confirmar:\n\n• Cantidad de personas confirmadas hasta el momento\n• Hora de llegada (11:00 AM) y salida estimada (1:30 PM)\n• Que las pistas estén reservadas y listas\n• Confirmar qué snacks/bebidas se van a pedir\n• Preguntar si necesitan pago parcial o total antes del evento" },
+
+    { id:"A-09", week:3, title:"Confirmar reserva del restaurante con headcount actualizado",
+      due:"2026-05-26",
+      desc:"Llamar a Palermo y confirmar:\n\n• Cantidad de personas confirmadas\n• Que el área/mesa está reservada\n• Recordar las restricciones alimentarias\n• Confirmar hora de llegada (1:30 PM)" },
+
+    { id:"A-10", week:3, title:"Enviar recordatorio al equipo",
+      due:"2026-05-29",
+      desc:"Enviar mensaje por WhatsApp al grupo:\n\n\"Recordatorio 🚀 El próximo jueves 4 de junio es nuestro Deploy & Chill. Nos vemos a las 11:00 AM en Futeca Bowling, La Terraza, 2do nivel de CC La Estación, Zona 10. Dress code: casual. ¡No falten!\"\n\n<strong>Incluir:</strong> Ubicación de Google Maps del centro comercial." },
+
+    // SEMANA 4
+    { id:"A-11", week:4, title:"Confirmación final con Futeca Bowling",
+      due:"2026-06-03",
+      desc:"Llamar y confirmar un día antes:\n\n• \"Mañana jueves 4 llegamos a las 11:00 AM, somos X personas\"\n• Que las pistas estén listas y reservadas\n• Que los snacks estén coordinados\n• Nombre de la persona que nos va a recibir\n• Confirmar forma de pago final" },
+
+    { id:"A-12", week:4, title:"Confirmación final con Restaurante Palermo",
+      due:"2026-06-03",
+      desc:"Llamar y confirmar un día antes:\n\n• \"Mañana jueves 4 llegamos aprox. a la 1:30 PM, somos X personas\"\n• Confirmar menú y restricciones alimentarias\n• Confirmar que el área está reservada\n• Nombre del mesero o encargado que nos va a atender\n• Confirmar forma de pago" },
+
+    { id:"A-13", week:4, title:"Preparar lista final de asistentes",
+      due:"2026-06-03",
+      desc:"Enviarle a Yosh la lista final de quiénes confirmaron que sí van.\n\nEsta lista se usa para:\n• Saber cuántos regalos llevar\n• Armar los equipos del torneo en la web app\n• Ajustar cantidad de comida/bebida con ambos venues" },
+
+    // DIA DEL EVENTO
+    { id:"A-14", week:5, title:"Llegar temprano con Yosh a La Estación",
+      due:"2026-06-04",
+      desc:"Hora: 10:30 AM\n\n• Llegar a CC La Estación\n• Subir a Futeca Bowling, ubicar al contacto, verificar pistas listas\n• Dejar regalos y premios en lugar seguro dentro del boliche\n• Coordinar con staff dónde se sienta el grupo, dónde van los snacks\n• Bajar a verificar que la mesa en Palermo esté lista para la 1:30 PM" },
+
+    { id:"A-15", week:5, title:"Coordinar durante el evento",
+      due:"2026-06-04",
+      desc:"<strong>11:00–13:00 (Boliche):</strong>\n• Coordinar que los snacks se sirvan a tiempo\n• Asegurarse de que todos tengan zapatos\n• Estar pendiente de si falta algo\n\n<strong>13:30–16:30 (Almuerzo):</strong>\n• Coordinar con el mesero que los platos salgan en orden\n• Monitorear la cuenta de bebidas si es cuenta abierta con tope\n• Pedir la cuenta cuando Yosh indique" },
+
+    { id:"A-16", week:5, title:"Cierre administrativo",
+      due:"2026-06-05",
+      desc:"<strong>Viernes 5 de junio:</strong>\n\n• Recopilar facturas de Futeca y Palermo\n• Consolidar gasto total del evento\n• Entregar reporte de gastos a Yosh" },
+  ]
+};
+
+const WEEKS = {
+  1: { label:"Semana 1", range:"Mayo 8 – 14" },
+  2: { label:"Semana 2", range:"Mayo 18 – 23" },
+  3: { label:"Semana 3", range:"Mayo 25 – 30" },
+  4: { label:"Semana 4", range:"Junio 1 – 3" },
+  5: { label:"Día del evento", range:"Junio 4 – 5" }
+};
+
+const BUDGET = [
+  ["Futeca Bowling (5 pistas × 2.5h + zapatos)","Q2,130","$279"],
+  ["Snacks en boliche (pizza, nachos × 25)","Q1,250","$164"],
+  ["Bebidas en boliche","Q1,000","$131"],
+  ["Almuerzo Palermo (menú fijo × 25)","Q4,375","$573"],
+  ["Bebidas en restaurante","Q2,000","$262"],
+  ["Postres (opciones sin azúcar)","Q500","$66"],
+  ["Premios del torneo","Q1,300","$170"],
+  ["Regalos personalizados × 25","Q2,500","$328"],
+  ["Logística / imprevistos","Q500","$66"],
+];
+
+const AGENDA = [
+  ["10:30","Yosh y Audelina llegan, verifican todo"],
+  ["11:00","Llegada del equipo, entrega de regalos"],
+  ["11:15","Bienvenida, reglas del torneo, formación de equipos"],
+  ["11:30","Ronda 1 del torneo + snacks"],
+  ["12:15","Ronda 2 / Semifinales"],
+  ["13:00","Final + premiación"],
+  ["13:30","Traslado a Palermo (mismo CC)"],
+  ["13:45","Almuerzo — cortes de carne + bebidas"],
+  ["15:00","Brindis + palabras del director"],
+  ["15:30","Sobremesa y convivencia libre"],
+  ["16:00","Cierre"],
+];
+
+// ═══════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════
+let STATE = {
+  user: localStorage.getItem("dc_user") || null,
+  activeTab: null,
+  expanded: {},
+  taskData: {},
+  budgetOpen: false,
+};
+
+// ═══════════════════════════════════════════════════════════════
+// FIREBASE SYNC
+// ═══════════════════════════════════════════════════════════════
+function initFirebase() {
+  db.ref("tasks").on("value", snap => {
+    STATE.taskData = snap.val() || {};
+    render();
+  });
+}
+
+function toggleTask(id) {
+  const current = STATE.taskData[id]?.done || false;
+  db.ref("tasks/" + id).update({
+    done: !current,
+    doneAt: !current ? new Date().toISOString() : null,
+    doneBy: !current ? STATE.user : null
+  });
+}
+
+let noteTimers = {};
+function updateNote(id, value) {
+  clearTimeout(noteTimers[id]);
+  noteTimers[id] = setTimeout(() => {
+    db.ref("tasks/" + id).update({ notes: value });
+  }, 800);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════════
+function esc(s) { const d=document.createElement("div");d.textContent=s;return d.innerHTML; }
+function today() { return new Date().toISOString().slice(0,10); }
+function daysUntil(d) { return Math.floor((new Date(d)-new Date())/86400000); }
+function fmtDate(d) { return new Date(d+"T12:00:00").toLocaleDateString("es",{weekday:"short",day:"numeric",month:"short"}); }
+
+function getWeekNum() {
+  const t = today();
+  if (t <= "2026-05-14") return 1;
+  if (t <= "2026-05-23") return 2;
+  if (t <= "2026-05-30") return 3;
+  if (t <= "2026-06-03") return 4;
+  return 5;
+}
+
+function taskBadge(due, done) {
+  if (done) return '<span class="task-badge badge-done">Completada</span>';
+  const d = daysUntil(due);
+  if (d < 0) return '<span class="task-badge badge-overdue">Vencida ' + Math.abs(d) + 'd</span>';
+  if (d <= 2) return '<span class="task-badge badge-soon">' + d + 'd restantes</span>';
+  return '';
+}
+
+function pct(tasks) {
+  if (!tasks.length) return 0;
+  const done = tasks.filter(t => STATE.taskData[t.id]?.done).length;
+  return Math.round((done / tasks.length) * 100);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════════════════════
+function render() {
+  const { user, activeTab, expanded, taskData, budgetOpen } = STATE;
+
+  // LOGIN SCREEN
+  if (!user) {
+    document.getElementById("app").innerHTML = `
+      <div class="login-screen">
+        <div class="login-box">
+          <div class="login-logo">Affinity Dev Team</div>
+          <div class="login-title">Deploy & Chill</div>
+          <div class="login-sub">Tracker del evento — Jueves 4 de junio 2026</div>
+          <span class="login-label">¿Quién eres?</span>
+          <div class="login-btns">
+            <button class="login-btn" onclick="login('yosh')">
+              <div class="avatar y">JU</div>
+              <div><div>Josué Ubico</div><div class="role">Director de Desarrollo — Vista completa</div></div>
+            </button>
+            <button class="login-btn" onclick="login('audelina')">
+              <div class="avatar a">AN</div>
+              <div><div>Audelina Najera</div><div class="role">Asistente Administrativa — Mi checklist</div></div>
+            </button>
+          </div>
+        </div>
+      </div>`;
+    return;
+  }
+
+  const isYosh = user === "yosh";
+  const tab = activeTab || (isYosh ? "yosh" : "audelina");
+  const currentWeek = getWeekNum();
+
+  // Determine visible tabs and tasks
+  const tabs = isYosh ? ["yosh","audelina"] : ["audelina"];
+  const tasks = TASKS[tab];
+  const yoshPct = pct(TASKS.yosh);
+  const audelinaPct = pct(TASKS.audelina);
+  const allTasks = [...TASKS.yosh, ...TASKS.audelina];
+  const globalPct = pct(allTasks);
+
+  let html = '';
+
+  // TOPBAR
+  html += `<div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-logo">DC</div>
+      <div class="topbar-text">
+        <div class="ev-name">Deploy & Chill</div>
+        <div class="ev-date">Jueves 4 de junio 2026</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="topbar-user">
+        <span class="dot" style="background:${isYosh?'var(--amber)':'var(--emerald)'}"></span>
+        ${isYosh ? 'Josué Ubico' : 'Audelina Najera'}
+      </div>
+      <button class="btn-logout" onclick="logout()">Salir</button>
+    </div>
+  </div>`;
+
+  // PROGRESS
+  html += `<div class="progress-global"><div class="progress-row">`;
+  if (isYosh) {
+    html += `<div class="progress-item">
+      <div class="label">Progreso Global</div>
+      <div class="bar-wrap"><div class="bar-fill amber" style="width:${globalPct}%"></div></div>
+      <div class="pct">${globalPct}% completado</div>
+    </div>
+    <div class="progress-item">
+      <div class="label">Yosh</div>
+      <div class="bar-wrap"><div class="bar-fill amber" style="width:${yoshPct}%"></div></div>
+      <div class="pct">${yoshPct}%</div>
+    </div>
+    <div class="progress-item">
+      <div class="label">Audelina</div>
+      <div class="bar-wrap"><div class="bar-fill emerald" style="width:${audelinaPct}%"></div></div>
+      <div class="pct">${audelinaPct}%</div>
+    </div>`;
+  } else {
+    html += `<div class="progress-item">
+      <div class="label">Mi progreso</div>
+      <div class="bar-wrap"><div class="bar-fill emerald" style="width:${audelinaPct}%"></div></div>
+      <div class="pct">${audelinaPct}% completado — ${TASKS.audelina.filter(t=>taskData[t.id]?.done).length} de ${TASKS.audelina.length} tareas</div>
+    </div>`;
+  }
+  html += `</div></div>`;
+
+  // TABS
+  if (tabs.length > 1) {
+    html += `<div class="tabs-wrap">`;
+    tabs.forEach(t => {
+      const label = t === "yosh" ? "Yosh" : "Audelina";
+      const count = TASKS[t].filter(tk => !taskData[tk.id]?.done).length;
+      html += `<button class="tab-btn ${tab===t?'active':''}" onclick="switchTab('${t}')">
+        ${label}<span class="tab-count">${count} pendientes</span>
+      </button>`;
+    });
+    html += `</div>`;
+  }
+
+  // CHECKLIST
+  html += `<div class="container"><div class="checklist-wrap" style="${tabs.length<=1?'border-radius:12px':''}">`;
+
+  const weeks = [...new Set(tasks.map(t => t.week))];
+  weeks.forEach(w => {
+    const wk = WEEKS[w];
+    const weekTasks = tasks.filter(t => t.week === w);
+    const weekDone = weekTasks.filter(t => taskData[t.id]?.done).length;
+    const isCurrent = w === currentWeek;
+
+    html += `<div class="week-header ${isCurrent?'week-current':''}">
+      <div class="week-title">${wk.label} <span>${wk.range}</span></div>
+      <div class="week-count">${weekDone}/${weekTasks.length}</div>
+    </div>`;
+
+    weekTasks.forEach(t => {
+      const isDone = taskData[t.id]?.done || false;
+      const isExp = expanded[t.id] || false;
+      const notes = taskData[t.id]?.notes || '';
+      const badge = taskBadge(t.due, isDone);
+
+      html += `<div class="task ${isDone?'done':''} ${isExp?'expanded':''}">
+        <div class="task-main">
+          <div class="task-check ${isDone?'done':''}" onclick="event.stopPropagation();toggleTask('${t.id}')">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7l3 3 5-6" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="task-body" onclick="toggleExpand('${t.id}')">
+            <div class="task-top">
+              <span class="task-code">${t.id}</span>
+              <span class="task-title">${esc(t.title)}</span>
+            </div>
+            <div class="task-meta">
+              <span class="task-date">${fmtDate(t.due)}</span>
+              ${badge}
+            </div>
+          </div>
+          <svg class="task-chevron" onclick="toggleExpand('${t.id}')" width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <path d="M7 5l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        ${isExp ? renderDetail(t, notes) : ''}
+      </div>`;
+    });
+  });
+
+  html += `</div></div>`;
+
+  // EVENT INFO
+  html += `<div class="event-info"><div class="event-card">
+    <h3>Agenda del día — Jueves 4 de junio</h3>
+    ${AGENDA.map(([time, what]) => `<div class="agenda-row"><span class="agenda-time">${time}</span><span class="agenda-what">${esc(what)}</span></div>`).join('')}
+  </div></div>`;
+
+  // BUDGET
+  html += `<div class="budget-section">
+    <button class="budget-toggle" onclick="toggleBudget()">
+      Presupuesto estimado <span class="budget-total">Q15,555 · USD $2,039</span>
+    </button>
+    <div class="budget-body ${budgetOpen?'open':''}">
+      <table class="budget-table">
+        <thead><tr><th>Rubro</th><th>Q</th><th>USD</th></tr></thead>
+        <tbody>
+          ${BUDGET.map(([r,q,u]) => `<tr><td>${esc(r)}</td><td>${q}</td><td>${u}</td></tr>`).join('')}
+          <tr><td>TOTAL ESTIMADO</td><td>Q15,555</td><td>$2,039</td></tr>
+          <tr><td>Sobrante</td><td class="sobrante">Q3,520</td><td class="sobrante">$461</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>`;
+
+  // FOOTER
+  html += `<div class="footer"><p>Deploy & Chill 2026 · Affinity Marketing International · Dirección de Desarrollo</p></div>`;
+
+  document.getElementById("app").innerHTML = html;
+}
+
+function renderDetail(t, notes) {
+  let html = '<div class="task-detail">';
+
+  if (t.desc) {
+    html += `<div class="task-desc">${t.desc}</div>`;
+  }
+
+  if (t.script) {
+    html += `<div class="task-script">
+      <div class="task-script-title">Qué decir al llamar</div>
+      <div class="task-script-body">"${esc(t.script)}"</div>
+    </div>`;
+  }
+
+  if (t.questions && t.questions.length) {
+    html += `<div class="task-questions">
+      <div class="task-questions-title">Preguntas que debe hacer (anotar cada respuesta)</div>
+      <ol>${t.questions.map(q => `<li>${esc(q)}</li>`).join('')}</ol>
+    </div>`;
+  }
+
+  html += `<div class="task-notes-wrap">
+    <div class="task-notes-label">Notas y observaciones</div>
+    <textarea class="task-notes" placeholder="Agrega notas aquí..." oninput="updateNote('${t.id}',this.value)">${esc(notes)}</textarea>
+  </div>`;
+
+  html += '</div>';
+  return html;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ACTIONS
+// ═══════════════════════════════════════════════════════════════
+function login(who) {
+  STATE.user = who;
+  STATE.activeTab = who === "yosh" ? "yosh" : "audelina";
+  localStorage.setItem("dc_user", who);
+  initFirebase();
+  render();
+}
+
+function logout() {
+  STATE.user = null;
+  STATE.activeTab = null;
+  localStorage.removeItem("dc_user");
+  render();
+}
+
+function switchTab(t) {
+  STATE.activeTab = t;
+  STATE.expanded = {};
+  render();
+}
+
+function toggleExpand(id) {
+  STATE.expanded[id] = !STATE.expanded[id];
+  render();
+}
+
+function toggleBudget() {
+  STATE.budgetOpen = !STATE.budgetOpen;
+  render();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════
+if (STATE.user) {
+  initFirebase();
+}
+render();
+</script>
+</body>
+</html>
