@@ -445,8 +445,10 @@ let STATE = {
 // ═══════════════════════════════════════════════════════════════
 // FIREBASE SYNC
 // ═══════════════════════════════════════════════════════════════
+const DB_BASE = "deploy_and_chill_2026";
+
 function initFirebase() {
-  db.ref("tasks").on("value", snap => {
+  db.ref(DB_BASE + "/tasks").on("value", snap => {
     STATE.taskData = snap.val() || {};
     render();
   });
@@ -454,7 +456,7 @@ function initFirebase() {
 
 function toggleTask(id) {
   const current = STATE.taskData[id]?.done || false;
-  db.ref("tasks/" + id).update({
+  db.ref(DB_BASE + "/tasks/" + id).update({
     done: !current,
     doneAt: !current ? new Date().toISOString() : null,
     doneBy: !current ? STATE.user : null
@@ -465,7 +467,7 @@ let noteTimers = {};
 function updateNote(id, value) {
   clearTimeout(noteTimers[id]);
   noteTimers[id] = setTimeout(() => {
-    db.ref("tasks/" + id).update({ notes: value });
+    db.ref(DB_BASE + "/tasks/" + id).update({ notes: value });
   }, 800);
 }
 
