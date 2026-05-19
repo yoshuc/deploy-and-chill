@@ -124,6 +124,11 @@ body{background:var(--bg);color:var(--text-secondary);font-family:var(--sans);mi
   background:var(--amber-dim);padding:2px 8px;border-radius:4px;flex-shrink:0}
 .task-title{font-size:14px;font-weight:600;color:var(--text-secondary);line-height:1.4}
 .task.done .task-title{color:var(--text-dim);text-decoration:line-through;text-decoration-color:var(--text-faint)}
+.task.deprecated{opacity:0.4;pointer-events:none;user-select:none}
+.task.deprecated .task-title{color:var(--text-faint);text-decoration:line-through;text-decoration-color:var(--text-faint)}
+.task.deprecated .task-code{background:#ffffff08;color:var(--text-faint)}
+.task.deprecated .task-check{background:var(--text-faint);border-color:var(--text-faint)}
+.task.deprecated .task-check svg{opacity:1}
 .task-meta{display:flex;gap:10px;margin-top:4px;align-items:center;flex-wrap:wrap}
 .task-date{font-size:12px;font-family:var(--mono);color:var(--text-dim)}
 .task-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px}
@@ -303,7 +308,7 @@ const TASKS = {
       desc:"Elegir entre las opciones de regalo. Buscar proveedor, pedir muestra si es posible, aprobar diseño, ordenar 25 unidades + 2 extras.\n\n<strong>Opciones evaluadas:</strong>\n• Camiseta negra \"Deploy & Chill 2026\" — Q60–100/pp, 10–14 días\n• Tumbler/botella térmica grabado láser — Q80–120/pp, 7–10 días\n• Kit dev (mousepad + stickers + pin) — Q70–100/pp, 7–10 días\n• Hoodie zip negro con bordado — Q120–180/pp, 14–18 días\n\n<strong>Nota:</strong> Si eliges camiseta o hoodie, necesitas recopilar tallas. Puedes pedirle a Audelina que lo pregunte por WhatsApp." },
 
     // SEMANA 2
-    { id:"Y-04", week:2, title:"Decidir los premios del torneo",
+    { id:"Y-04", week:2, title:"Decidir los premios del torneo", deprecated:true,
       due:"2026-05-23",
       desc:"Comprar premios para las categorías:\n\n🏆 <strong>Equipo campeón (4–5 personas):</strong> Gift card individual Q150 (Amazon, Uber Eats, o tienda tech) → Q600–750 total\n🥈 <strong>Segundo lugar:</strong> Gift card individual Q75 → Q300–375 total\n🎯 <strong>MVP (mejor score individual):</strong> Audífonos bluetooth o power bank premium → Q200–300\n😂 <strong>\"404: Pins Not Found\" (último lugar):</strong> Trofeo chistoso o camiseta → Q50–100\n\nTotal estimado en premios: Q1,150–1,525" },
 
@@ -311,13 +316,13 @@ const TASKS = {
       due:"2026-05-16",
       desc:"Crear imagen para WhatsApp/correo en Canva (1600×400px para header, o formato vertical para WhatsApp).\n\n<strong>Debe incluir:</strong>\n• Nombre: Deploy & Chill\n• Fecha: Jueves 4 de junio\n• Hora: 11:00 AM\n• Lugar: CC La Estación, Zona 10\n• Dress code: Casual\n• Incluye almuerzo y bebidas\n• \"Confirma tu asistencia con Audelina\"" },
 
-    { id:"Y-06", week:2, title:"Crear la web app del torneo de boliche",
+    { id:"Y-06", week:2, title:"Crear la web app del torneo de boliche", deprecated:true,
       due:"2026-05-28",
       desc:"Funcionalidades requeridas:\n• Registro de asistentes el día del evento\n• Generador aleatorio de equipos con nombres temáticos\n• Formato flexible: arma equipos de 4–5 personas según asistentes reales\n• Bracket visual del torneo (automático según cantidad de equipos)\n• Input de scores por ronda desde celular\n• Leaderboard en tiempo real\n• Pantalla de resultados finales (campeón, MVP, \"404 Pins Not Found\")" },
 
     { id:"Y-07", week:2, title:"Enviar invitación oficial al equipo",
       due:"2026-05-19",
-      desc:"Canal: WhatsApp grupal + correo electrónico.\n\n<strong>Mensaje sugerido:</strong>\n\"Equipo 🚀 El próximo jueves 4 de junio tenemos un Deploy & Chill — un día fuera de código para todo el equipo GT. Incluye torneo de boliche con premios, almuerzo premium con cortes de carne, y bebidas. Lugar: CC La Estación, Z10. Hora: 11:00 AM. Dress code: casual. Confirma tu asistencia con Audelina antes del viernes 23 de mayo.\"" },
+      desc:"Canal: WhatsApp grupal + correo electrónico.\n\n<strong>Mensaje sugerido:</strong>\n\"Equipo 🚀 El próximo jueves 4 de junio tenemos un Deploy & Chill — un día fuera de código para todo el equipo GT. Incluye boliche, almuerzo premium con cortes de carne argentinos, y bebidas. Lugar: CC La Estación, Z10. Hora: 11:00 AM. Dress code: casual. Confirma tu asistencia con Audelina antes del viernes 23 de mayo.\"" },
 
     { id:"Y-08", week:2, title:"Validar cotizaciones de Audelina",
       due:"2026-05-21",
@@ -336,37 +341,33 @@ const TASKS = {
       due:"2026-05-30",
       desc:"Recoger los regalos del proveedor. Verificar cantidad (25 + 2 extras), calidad de impresión/grabado, y que todo esté en orden." },
 
-    { id:"Y-12", week:3, title:"Comprar premios del torneo",
+    { id:"Y-12", week:3, title:"Comprar premios del torneo", deprecated:true,
       due:"2026-05-30",
       desc:"Si aún no se han adquirido los premios definidos en Y-04, comprarlos esta semana. Tener todo empacado y listo." },
 
     // SEMANA 4
-    { id:"Y-13", week:4, title:"Probar la web app del torneo",
+    { id:"Y-13", week:4, title:"Probar la web app del torneo", deprecated:true,
       due:"2026-06-03",
       desc:"Cargar datos de prueba, simular un torneo completo, verificar que funcione bien en celular. Probar en al menos 2 navegadores diferentes." },
 
     { id:"Y-14", week:4, title:"Preparar todo la noche anterior",
       due:"2026-06-03",
-      desc:"Empacar regalos, premios, cualquier material. Verificar que el celular tenga batería y la web app cargada. Confirmar hora de llegada con Audelina (10:30 AM en La Estación)." },
+      desc:"Empacar regalos y cualquier material. Verificar que el celular tenga batería. Confirmar hora de llegada con Audelina (10:30 AM en La Estación)." },
   ],
 
   audelina: [
     // SEMANA 1
-    { id:"A-01", week:1, title:"Llamar a Futeca Bowling — cotizar evento corporativo",
+    { id:"A-01", week:1, title:"Renegociar paquete con Futeca Bowling",
       due:"2026-05-12",
-      desc:"Contacto: WhatsApp +502 3758-6118\nUbicación: CC La Estación, La Terraza, 2do nivel, Zona 10",
-      script:"Buenos días, les llamo de parte de Affinity Marketing International. Estamos organizando un evento corporativo de team building para 25 personas el jueves 4 de junio. Nos gustaría cotizar un paquete para un torneo de boliche de aproximadamente 2 a 2.5 horas, con snacks y bebidas. ¿Manejan paquetes corporativos?",
+      desc:"Contacto: WhatsApp +502 3758-6118\nUbicación: CC La Estación, La Terraza, 2do nivel, Zona 10\n\n<strong>Ya tenemos cotización aprobada por Q4,020.50 pero necesitamos reducir el paquete.</strong>",
+      script:"Hola, soy Audelina de Affinity Marketing. Ya tenemos una cotización aprobada con ustedes para el jueves 4 de junio. Necesitamos hacer unos ajustes al paquete: reducir a 1 hora de boliche, quitar las pizzas, y bajar de 25 a 20 cervezas. ¿Nos pueden dar un precio actualizado?",
       questions:[
-        "¿Tienen disponibilidad el jueves 4 de junio de 11:00 AM a 1:30 PM?",
-        "¿Cuántas pistas pueden reservarnos? Necesitamos mínimo 5 pistas (5 personas por pista). ¿Pueden reservar un bloque contiguo o área exclusiva?",
-        "¿Cuánto cuesta la hora por pista entre semana? ¿Precio especial para grupos/corporativos?",
-        "¿El alquiler de zapatos está incluido o es aparte? ¿Cuánto cuesta por persona?",
-        "¿Podemos reservar por 2.5 horas corridas? ¿O cobran por hora exacta?",
-        "¿Qué opciones de comida tienen para servir durante el boliche? ¿Pueden armar un paquete de snacks para 25 personas (pizzas + nachos + gaseosas)? ¿Cuánto costaría?",
-        "¿Venden cerveza y tragos? ¿Manejan cuenta abierta con tope? ¿Permiten llevar bebidas propias (descorche)?",
-        "¿Tienen un paquete todo incluido (pistas + snacks + bebidas) con precio por persona?",
-        "¿Requieren depósito para reservar? ¿Cuánto? ¿Política de cancelación?",
-        "¿Hay una persona específica que maneje eventos corporativos? Nombre y contacto directo.",
+        "¿Cuál sería el nuevo precio con estos cambios: 5 pistas × 1 hora, sin pizzas, mantener nachos y gaseosas, 20 cervezas en vez de 25, mantener arcade y salón?",
+        "¿Sigue aplicando el 15% de descuento por reservar en mayo?",
+        "¿Cuál sería el nuevo monto de anticipo?",
+        "¿Necesitamos firmar un contrato nuevo o se modifica el existente?",
+        "¿El alquiler de zapatos sigue incluido?",
+        "¿Permiten llevar bebidas propias (descorche)?",
         "¿Tienen pantallas donde se pueda proyectar algo? ¿Se puede poner música propia?",
         "¿El parqueo del centro comercial es gratuito o tiene costo?"
       ]},
@@ -437,16 +438,16 @@ const TASKS = {
 
     { id:"A-13", week:4, title:"Preparar lista final de asistentes",
       due:"2026-06-03",
-      desc:"Enviarle a Yosh la lista final de quiénes confirmaron que sí van.\n\nEsta lista se usa para:\n• Saber cuántos regalos llevar\n• Armar los equipos del torneo en la web app\n• Ajustar cantidad de comida/bebida con ambos venues" },
+      desc:"Enviarle a Yosh la lista final de quiénes confirmaron que sí van.\n\nEsta lista se usa para:\n• Saber cuántos regalos llevar\n• Ajustar cantidad de comida/bebida con ambos venues" },
 
     // DIA DEL EVENTO
     { id:"A-14", week:5, title:"Llegar temprano con Yosh a La Estación",
       due:"2026-06-04",
-      desc:"Hora: 10:30 AM\n\n• Llegar a CC La Estación\n• Subir a Futeca Bowling, ubicar al contacto, verificar pistas listas\n• Dejar regalos y premios en lugar seguro dentro del boliche\n• Coordinar con staff dónde se sienta el grupo, dónde van los snacks\n• Bajar a verificar que la mesa en Palermo esté lista para la 1:30 PM" },
+      desc:"Hora: 10:30 AM\n\n• Llegar a CC La Estación\n• Subir a Futeca Bowling, ubicar al contacto, verificar pistas listas\n• Dejar regalos en lugar seguro dentro del boliche\n• Coordinar con staff dónde se sienta el grupo, dónde van los snacks\n• Bajar a verificar que la mesa en Palermo esté lista para la 1:30 PM" },
 
     { id:"A-15", week:5, title:"Coordinar durante el evento",
       due:"2026-06-04",
-      desc:"<strong>11:00–13:00 (Boliche):</strong>\n• Coordinar que los snacks se sirvan a tiempo\n• Asegurarse de que todos tengan zapatos\n• Estar pendiente de si falta algo\n\n<strong>13:30–16:30 (Almuerzo):</strong>\n• Coordinar con el mesero que los platos salgan en orden\n• Monitorear la cuenta de bebidas si es cuenta abierta con tope\n• Pedir la cuenta cuando Yosh indique" },
+      desc:"<strong>11:00–12:30 (Boliche):</strong>\n• Coordinar que los snacks se sirvan a tiempo\n• Asegurarse de que todos tengan zapatos\n• Estar pendiente de si falta algo\n\n<strong>13:15–16:00 (Almuerzo Palermo):</strong>\n• Coordinar con el mesero que los platos salgan en orden\n• Monitorear la cuenta de bebidas si es cuenta abierta con tope\n• Pedir la cuenta cuando Yosh indique" },
 
     { id:"A-16", week:5, title:"Cierre administrativo",
       due:"2026-06-05",
@@ -463,26 +464,25 @@ const WEEKS = {
 };
 
 const BUDGET = [
-  ["Futeca Bowling (5 pistas × 2.5h + zapatos)","Q2,130","$279"],
-  ["Snacks en boliche (pizza, nachos × 25)","Q1,250","$164"],
-  ["Bebidas en boliche","Q1,000","$131"],
-  ["Almuerzo Palermo (menú fijo × 25)","Q4,375","$573"],
-  ["Bebidas en restaurante","Q2,000","$262"],
-  ["Postres (opciones sin azúcar)","Q500","$66"],
-  ["Premios del torneo","Q1,300","$170"],
-  ["Regalos personalizados × 25","Q2,500","$328"],
+  ["Futeca Bowling (5 pistas × 1h, renegociado)","~Q1,785","$234"],
+  ["Palermo Menú #2 × 25 (Q299/pp)","Q7,475","$980"],
+  ["Cervezas Palermo × 25 (Q30/pp)","Q750","$98"],
+  ["Descorche vino × 4 botellas","Q600","$79"],
+  ["10% servicio Palermo","Q883","$116"],
+  ["Regalos playera × 25 (Q100/pp)","Q2,500","$328"],
+  ["Detalle extra (lapicero/llavero)","Q500","$66"],
   ["Logística / imprevistos","Q500","$66"],
 ];
 
 const AGENDA = [
   ["10:30","Yosh y Audelina llegan, verifican todo"],
   ["11:00","Llegada del equipo, entrega de regalos"],
-  ["11:15","Bienvenida, reglas del torneo, formación de equipos"],
-  ["11:30","Ronda 1 del torneo + snacks"],
-  ["12:15","Ronda 2 / Semifinales"],
-  ["13:00","Final + premiación"],
-  ["13:30","Traslado a Palermo (mismo CC)"],
-  ["13:45","Almuerzo — cortes de carne + bebidas"],
+  ["11:15","Bienvenida breve + snacks y bebidas"],
+  ["11:30","Boliche libre — cada quien a su ritmo + arcade"],
+  ["12:30","Cierre del boliche, convivencia libre"],
+  ["13:00","Traslado a Palermo (mismo CC, bajar 1 nivel)"],
+  ["13:15","Llegada al salón, acomodo"],
+  ["13:30","Almuerzo — Menú #2 Palermo (cortes argentinos)"],
   ["15:00","Brindis + palabras del director"],
   ["15:30","Sobremesa y convivencia libre"],
   ["16:00","Cierre"],
@@ -659,9 +659,10 @@ function taskBadge(due, done) {
 }
 
 function pct(tasks) {
-  if (!tasks.length) return 0;
-  const done = tasks.filter(t => STATE.taskData[t.id]?.done).length;
-  return Math.round((done / tasks.length) * 100);
+  const active = tasks.filter(t => !t.deprecated);
+  if (!active.length) return 0;
+  const done = active.filter(t => STATE.taskData[t.id]?.done).length;
+  return Math.round((done / active.length) * 100);
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -748,7 +749,7 @@ function render() {
     html += `<div class="progress-item">
       <div class="label">Mi progreso</div>
       <div class="bar-wrap"><div class="bar-fill emerald" style="width:${audelinaPct}%"></div></div>
-      <div class="pct">${audelinaPct}% completado — ${TASKS.audelina.filter(t=>taskData[t.id]?.done).length} de ${TASKS.audelina.length} tareas</div>
+      <div class="pct">${audelinaPct}% completado — ${TASKS.audelina.filter(t=>!t.deprecated && taskData[t.id]?.done).length} de ${TASKS.audelina.filter(t=>!t.deprecated).length} tareas</div>
     </div>`;
   }
   html += `</div></div>`;
@@ -758,7 +759,7 @@ function render() {
     html += `<div class="tabs-wrap">`;
     tabs.forEach(t => {
       const label = t === "yosh" ? "Yosh" : "Audelina";
-      const count = TASKS[t].filter(tk => !taskData[tk.id]?.done).length;
+      const count = TASKS[t].filter(tk => !tk.deprecated && !taskData[tk.id]?.done).length;
       html += `<button class="tab-btn ${tab===t?'active':''}" onclick="switchTab('${t}')">
         ${label}<span class="tab-count">${count} pendientes</span>
       </button>`;
@@ -782,17 +783,18 @@ function render() {
     </div>`;
 
     weekTasks.forEach(t => {
-      const isDone = taskData[t.id]?.done || false;
-      const isExp = expanded[t.id] || false;
+      const isDone = t.deprecated || taskData[t.id]?.done || false;
+      const isDeprecated = t.deprecated || false;
+      const isExp = !isDeprecated && (expanded[t.id] || false);
       const taskNotes = taskData[t.id]?.notes || {};
-      const badge = taskBadge(t.due, isDone);
+      const badge = isDeprecated ? '<span class="task-badge" style="background:#ffffff08;color:var(--text-faint)">Descartada</span>' : taskBadge(t.due, isDone);
 
-      html += `<div class="task ${isDone?'done':''} ${isExp?'expanded':''}">
+      html += `<div class="task ${isDone?'done':''} ${isDeprecated?'deprecated':''} ${isExp?'expanded':''}">
         <div class="task-main">
-          <div class="task-check ${isDone?'done':''}" onclick="event.stopPropagation();toggleTask('${t.id}')">
+          <div class="task-check ${isDone?'done':''}" ${isDeprecated?'':`onclick="event.stopPropagation();toggleTask('${t.id}')"`}>
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7l3 3 5-6" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </div>
-          <div class="task-body" onclick="toggleExpand('${t.id}')">
+          <div class="task-body" ${isDeprecated?'':`onclick="toggleExpand('${t.id}')"`}>
             <div class="task-top">
               <span class="task-code">${t.id}</span>
               <span class="task-title">${esc(t.title)}</span>
@@ -802,9 +804,9 @@ function render() {
               ${badge}
             </div>
           </div>
-          <svg class="task-chevron" onclick="toggleExpand('${t.id}')" width="18" height="18" viewBox="0 0 18 18" fill="none">
+          ${isDeprecated?'':`<svg class="task-chevron" onclick="toggleExpand('${t.id}')" width="18" height="18" viewBox="0 0 18 18" fill="none">
             <path d="M7 5l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+          </svg>`}
         </div>
         ${isExp ? renderDetail(t, taskNotes) : ''}
       </div>`;
@@ -822,15 +824,15 @@ function render() {
   // BUDGET
   html += `<div class="budget-section">
     <button class="budget-toggle" onclick="toggleBudget()">
-      Presupuesto estimado <span class="budget-total">Q15,555 · USD $2,039</span>
+      Presupuesto estimado <span class="budget-total">~Q14,993 · USD $1,967</span>
     </button>
     <div class="budget-body ${budgetOpen?'open':''}">
       <table class="budget-table">
         <thead><tr><th>Rubro</th><th>Q</th><th>USD</th></tr></thead>
         <tbody>
           ${BUDGET.map(([r,q,u]) => `<tr><td>${esc(r)}</td><td>${q}</td><td>${u}</td></tr>`).join('')}
-          <tr><td>TOTAL ESTIMADO</td><td>Q15,555</td><td>$2,039</td></tr>
-          <tr><td>Sobrante</td><td class="sobrante">Q3,520</td><td class="sobrante">$461</td></tr>
+          <tr><td>TOTAL ESTIMADO</td><td>~Q14,993</td><td>$1,967</td></tr>
+          <tr><td>Sobrante</td><td class="sobrante">~Q4,082</td><td class="sobrante">$535</td></tr>
         </tbody>
       </table>
     </div>
