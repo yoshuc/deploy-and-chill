@@ -18,7 +18,1259 @@
   --border-light: #3e4f68;
   --text: #f8fafc;
   --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deploy & Chill — Tracker</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%23f59e0b'/><text x='16' y='22' text-anchor='middle' fill='%230f172a' font-size='16' font-weight='bold'>DC</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-storage-compat.js"></script>
+<style>
+:root {
+  --bg: #0f172a;
+  --bg-card: #1e293b;
+  --bg-surface: #273449;
+  --border: #334155;
+  --border-light: #3e4f68;
+  --text: #f8fafc;
+  --text-secondary: #cbd5e1;
   --text-muted: #94a3b8;
+  --text-dim: #64748b;
+  --text-faint: #475569;
+  --amber: #f59e0b;
+  --amber-dim: #f59e0b20;
+  --emerald: #10b981;
+  --emerald-dim: #10b98118;
+  --red: #ef4444;
+  --red-dim: #ef444418;
+  --sans: 'DM Sans', system-ui, sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text-secondary);font-family:var(--sans);min-height:100vh;-webkit-font-smoothing:antialiased}
+::selection{background:var(--amber);color:var(--bg)}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+/* ── LOGIN ── */
+.login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;
+  background:linear-gradient(160deg,#0f172a 0%,#0c1322 50%,#111827 100%)}
+.login-box{max-width:400px;width:100%;text-align:center}
+.login-logo{font-size:13px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--amber);margin-bottom:8px}
+.login-title{font-size:32px;font-weight:800;color:var(--text);margin-bottom:6px;letter-spacing:-0.5px}
+.login-sub{font-size:14px;color:var(--text-dim);margin-bottom:40px;line-height:1.5}
+.login-label{font-size:12px;font-weight:600;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:16px;display:block}
+.login-btns{display:flex;flex-direction:column;gap:10px}
+.login-btn{padding:18px 24px;border-radius:12px;border:2px solid var(--border);background:var(--bg-card);color:var(--text);
+  font-size:15px;font-weight:600;cursor:pointer;transition:all .25s;font-family:var(--sans);text-align:left;
+  display:flex;align-items:center;gap:14px}
+.login-btn:hover{border-color:var(--amber);background:var(--bg-surface);transform:translateY(-1px)}
+.login-btn .avatar{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;
+  font-size:16px;font-weight:800;color:var(--bg);flex-shrink:0}
+.login-btn .avatar.y{background:var(--amber)}
+.login-btn .avatar.a{background:var(--emerald)}
+.login-btn .role{font-size:12px;color:var(--text-dim);font-weight:400;margin-top:2px}
+
+/* ── TOPBAR ── */
+.topbar{background:var(--bg-card);border-bottom:1px solid var(--border);padding:14px 20px;
+  display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:50;
+  backdrop-filter:blur(12px);flex-wrap:wrap;gap:10px}
+.topbar-left{display:flex;align-items:center;gap:12px}
+.topbar-logo{width:36px;height:36px;border-radius:9px;background:var(--amber);display:flex;align-items:center;
+  justify-content:center;font-size:13px;font-weight:800;color:var(--bg);flex-shrink:0;letter-spacing:-0.5px}
+.topbar-text .ev-name{font-size:17px;font-weight:800;color:var(--text);letter-spacing:-0.3px}
+.topbar-text .ev-date{font-size:12px;color:var(--text-dim);font-family:var(--mono)}
+.topbar-right{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.topbar-user{display:flex;align-items:center;gap:8px;padding:6px 14px;border-radius:8px;
+  background:var(--bg-surface);font-size:13px;color:var(--text-muted);font-weight:500}
+.topbar-user .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.btn-logout{background:none;border:1px solid var(--border);border-radius:8px;padding:6px 14px;
+  font-size:12px;color:var(--text-dim);cursor:pointer;font-family:var(--sans);transition:all .2s}
+.btn-logout:hover{border-color:var(--text-dim);color:var(--text-muted)}
+
+/* ── PROGRESS GLOBAL ── */
+.progress-global{padding:16px 20px;background:var(--bg);border-bottom:1px solid var(--border)}
+.progress-row{display:flex;gap:16px;max-width:800px;margin:0 auto;flex-wrap:wrap}
+.progress-item{flex:1;min-width:140px}
+.progress-item .label{font-size:11px;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.progress-item .bar-wrap{height:6px;background:var(--bg-surface);border-radius:3px;overflow:hidden;margin-bottom:4px}
+.progress-item .bar-fill{height:100%;border-radius:3px;transition:width .6s}
+.progress-item .bar-fill.amber{background:var(--amber)}
+.progress-item .bar-fill.emerald{background:var(--emerald)}
+.progress-item .pct{font-size:12px;font-weight:700;font-family:var(--mono);color:var(--text-muted)}
+
+/* ── TABS ── */
+.tabs-wrap{max-width:800px;margin:0 auto;padding:20px 20px 0;display:flex;gap:6px}
+.tab-btn{padding:10px 22px;border-radius:10px 10px 0 0;border:1px solid var(--border);border-bottom:none;
+  font-size:13px;font-weight:700;cursor:pointer;background:var(--bg);color:var(--text-dim);
+  transition:all .2s;font-family:var(--sans);position:relative}
+.tab-btn.active{background:var(--bg-card);color:var(--text);border-color:var(--border)}
+.tab-btn .tab-count{font-size:11px;font-family:var(--mono);margin-left:6px;padding:2px 7px;
+  border-radius:10px;background:var(--bg-surface);color:var(--text-dim)}
+.tab-btn.active .tab-count{background:var(--amber-dim);color:var(--amber)}
+
+/* ── CONTAINER ── */
+.container{max-width:800px;margin:0 auto;padding:0 20px 40px}
+.checklist-wrap{background:var(--bg-card);border:1px solid var(--border);border-radius:0 12px 12px 12px;min-height:300px}
+
+/* ── WEEK HEADER ── */
+.week-header{padding:16px 20px 8px;display:flex;justify-content:space-between;align-items:center;
+  border-bottom:1px solid var(--border)}
+.week-header .week-title{font-size:13px;font-weight:700;color:var(--text);letter-spacing:0.5px}
+.week-header .week-title span{color:var(--text-dim);font-weight:500;margin-left:6px}
+.week-header .week-count{font-size:11px;font-family:var(--mono);color:var(--text-dim)}
+.week-current{border-left:3px solid var(--amber);background:var(--amber-dim)}
+
+/* ── TASK ROW ── */
+.task{border-bottom:1px solid #1e293b;transition:background .15s}
+.task:last-child{border-bottom:none}
+.task:hover{background:#ffffff04}
+.task-main{display:flex;align-items:flex-start;gap:12px;padding:14px 20px;cursor:pointer}
+.task-check{width:22px;height:22px;border-radius:6px;border:2px solid var(--border);flex-shrink:0;
+  margin-top:1px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;
+  background:none}
+.task-check:hover{border-color:var(--amber)}
+.task-check.done{background:var(--emerald);border-color:var(--emerald)}
+.task-check.done svg{opacity:1}
+.task-check svg{opacity:0;transition:opacity .15s}
+.task-body{flex:1;min-width:0}
+.task-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.task-code{font-size:11px;font-weight:700;font-family:var(--mono);color:var(--amber);
+  background:var(--amber-dim);padding:2px 8px;border-radius:4px;flex-shrink:0}
+.task-title{font-size:14px;font-weight:600;color:var(--text-secondary);line-height:1.4}
+.task.done .task-title{color:var(--text-dim);text-decoration:line-through;text-decoration-color:var(--text-faint)}
+.task.deprecated{opacity:0.4;pointer-events:none;user-select:none}
+.task.deprecated .task-title{color:var(--text-faint);text-decoration:line-through;text-decoration-color:var(--text-faint)}
+.task.deprecated .task-code{background:#ffffff08;color:var(--text-faint)}
+.task.deprecated .task-check{background:var(--text-faint);border-color:var(--text-faint)}
+.task.deprecated .task-check svg{opacity:1}
+.task-meta{display:flex;gap:10px;margin-top:4px;align-items:center;flex-wrap:wrap}
+.task-date{font-size:12px;font-family:var(--mono);color:var(--text-dim)}
+.task-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px}
+.badge-overdue{background:var(--red-dim);color:var(--red)}
+.badge-soon{background:var(--amber-dim);color:var(--amber)}
+.badge-done{background:var(--emerald-dim);color:var(--emerald)}
+.task-chevron{color:var(--text-faint);flex-shrink:0;transition:transform .2s;margin-top:2px}
+.task.expanded .task-chevron{transform:rotate(90deg)}
+
+/* ── TASK DETAIL ── */
+.task-detail{padding:0 20px 16px 54px;display:none}
+.task.expanded .task-detail{display:block;animation:slideDown .2s ease}
+@keyframes slideDown{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+.task-desc{font-size:13px;color:var(--text-muted);line-height:1.7;margin-bottom:12px;white-space:pre-line}
+.task-desc strong{color:var(--text-secondary);font-weight:600}
+.task-script{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px 16px;
+  margin-bottom:12px}
+.task-script-title{font-size:11px;font-weight:700;color:var(--amber);text-transform:uppercase;
+  letter-spacing:1px;margin-bottom:8px}
+.task-script-body{font-size:13px;color:var(--text-muted);line-height:1.7;white-space:pre-line}
+.task-questions{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px 16px;
+  margin-bottom:12px}
+.task-questions-title{font-size:11px;font-weight:700;color:var(--emerald);text-transform:uppercase;
+  letter-spacing:1px;margin-bottom:8px}
+.task-questions ol{padding-left:18px;font-size:13px;color:var(--text-muted);line-height:1.8}
+.task-questions li{margin-bottom:2px}
+.task-notes-wrap{margin-top:12px}
+.task-notes-label{font-size:11px;font-weight:600;color:var(--text-dim);text-transform:uppercase;
+  letter-spacing:1px;margin-bottom:6px}
+.task-notes{width:100%;padding:10px 14px;border-radius:8px;border:1px solid var(--border);
+  background:var(--bg);color:var(--text-secondary);font-size:13px;font-family:var(--sans);
+  resize:vertical;min-height:44px;max-height:200px;outline:none;transition:border-color .2s}
+.task-notes:focus{border-color:var(--amber)}
+.task-notes::placeholder{color:var(--text-faint)}
+
+/* ── BUDGET ── */
+.budget-section{max-width:800px;margin:24px auto 40px;padding:0 20px}
+.budget-toggle{width:100%;padding:14px 20px;border-radius:12px;border:1px solid var(--border);
+  background:var(--bg-card);color:var(--text);font-size:14px;font-weight:700;cursor:pointer;
+  font-family:var(--sans);display:flex;justify-content:space-between;align-items:center;transition:all .2s}
+.budget-toggle:hover{border-color:var(--border-light)}
+.budget-toggle .budget-total{font-family:var(--mono);color:var(--amber)}
+.budget-body{background:var(--bg-card);border:1px solid var(--border);border-top:none;
+  border-radius:0 0 12px 12px;padding:16px 20px;display:none}
+.budget-body.open{display:block}
+.budget-table{width:100%;border-collapse:collapse}
+.budget-table th{text-align:left;font-size:11px;font-weight:700;color:var(--text-dim);
+  text-transform:uppercase;letter-spacing:1px;padding:8px 0;border-bottom:1px solid var(--border)}
+.budget-table th:nth-child(2),.budget-table th:nth-child(3){text-align:right}
+.budget-table td{padding:8px 0;font-size:13px;color:var(--text-muted);border-bottom:1px solid #1e293b}
+.budget-table td:nth-child(2),.budget-table td:nth-child(3){text-align:right;font-family:var(--mono);font-size:12px}
+.budget-table tr:last-child td{border-bottom:none;font-weight:700;color:var(--text);padding-top:12px}
+.budget-table .sobrante{color:var(--emerald)}
+
+/* ── EVENT INFO ── */
+.event-info{max-width:800px;margin:20px auto 0;padding:0 20px}
+.event-card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:20px}
+.event-card h3{font-size:14px;font-weight:700;color:var(--text);margin-bottom:12px}
+.agenda-row{display:flex;gap:12px;padding:6px 0;border-bottom:1px solid #1e293b;font-size:13px}
+.agenda-row:last-child{border-bottom:none}
+.agenda-time{font-family:var(--mono);color:var(--amber);font-size:12px;font-weight:600;
+  min-width:54px;flex-shrink:0}
+.agenda-what{color:var(--text-muted)}
+
+/* ── ORDERS VIEW ── */
+.orders-wrap{max-width:800px;margin:0 auto;padding:20px}
+.orders-subtabs{display:flex;gap:6px;margin-bottom:16px}
+.orders-subtab{padding:8px 18px;border-radius:8px;border:1px solid var(--border);font-size:13px;font-weight:600;
+cursor:pointer;background:var(--bg-card);color:var(--text-dim);transition:all .2s;font-family:var(--sans)}
+.orders-subtab.active{background:var(--amber);color:var(--bg);border-color:var(--amber)}
+.orders-group-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;
+color:var(--text-dim);padding:12px 0 8px;border-bottom:1px solid var(--border);margin-bottom:8px}
+.orders-group-row{display:flex;justify-content:space-between;padding:8px 16px;background:var(--bg-card);
+border-radius:8px;margin-bottom:4px;font-size:13px;color:var(--text-secondary)}
+.orders-group-row .count{font-family:var(--mono);font-weight:700;color:var(--amber);min-width:30px;text-align:right}
+.order-card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden}
+.order-card-header{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;
+border-bottom:1px solid #1e293b;cursor:pointer}
+.order-card-name{font-size:15px;font-weight:700;color:var(--text)}
+.order-card-actions{display:flex;gap:8px}
+.order-card-actions button{background:none;border:none;cursor:pointer;font-size:14px;padding:4px 8px;
+border-radius:6px;transition:all .2s}
+.order-card-actions .btn-del{color:var(--red)}
+.order-card-actions .btn-del:hover{background:var(--red);background:#ef444420}
+.order-card-body{padding:12px 18px}
+.order-item{display:flex;align-items:flex-start;gap:10px;padding:6px 0;font-size:13px}
+.order-item .oi-emoji{flex-shrink:0}
+.order-item .oi-label{color:var(--text-dim);min-width:70px;flex-shrink:0}
+.order-item .oi-value{color:var(--text-secondary);font-weight:500}
+.order-item .oi-detail{color:var(--text-dim);font-family:var(--mono);font-size:11px}
+.order-item.extra{color:var(--amber);font-style:italic}
+.order-item.extra .oi-value{color:var(--amber)}
+.order-extras-bar{display:flex;gap:6px;padding:10px 18px;border-top:1px solid #1e293b}
+.order-extras-bar button{padding:6px 12px;border-radius:6px;border:1px dashed var(--border);
+background:none;color:var(--text-dim);font-size:11px;font-weight:600;cursor:pointer;font-family:var(--sans);transition:all .2s}
+.order-extras-bar button:hover{border-color:var(--amber);color:var(--amber)}
+.orders-account{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:20px;margin-top:16px}
+.orders-account-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:12px}
+.orders-account-row{display:flex;justify-content:space-between;padding:6px 0;font-size:13px;color:var(--text-muted)}
+.orders-account-row.total{border-top:2px solid var(--amber);padding-top:12px;margin-top:8px;font-size:16px;
+font-weight:800;color:var(--text);font-family:var(--mono)}
+.orders-account-row .val{font-family:var(--mono);font-weight:600}
+.extra-modal{position:fixed;inset:0;background:#000a;z-index:200;display:flex;align-items:flex-end;justify-content:center}
+.extra-modal-box{background:var(--bg-card);border:1px solid var(--border);border-radius:16px 16px 0 0;
+padding:24px;width:100%;max-width:480px;max-height:70vh;overflow-y:auto}
+.extra-modal-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:12px}
+.extra-modal-opt{padding:10px 14px;border-radius:8px;border:1px solid var(--border);background:var(--bg-surface);
+margin-bottom:6px;cursor:pointer;transition:all .2s}
+.extra-modal-opt:hover{border-color:var(--amber)}
+.extra-modal-opt .option-name{font-size:14px;font-weight:600;color:var(--text-secondary)}
+.extra-modal-opt .option-desc{font-size:12px;font-family:var(--mono);color:var(--text-dim);margin-top:2px}
+.extra-modal-cancel{width:100%;padding:12px;border-radius:10px;border:none;background:var(--bg-surface);
+color:var(--text-muted);font-size:14px;font-weight:600;cursor:pointer;margin-top:10px;font-family:var(--sans)}
+
+/* ── FOOTER ── */
+.footer{max-width:800px;margin:0 auto;padding:20px;text-align:center}
+.footer p{font-size:11px;color:var(--text-faint)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:640px){
+  .topbar{padding:12px 14px}
+  .topbar-text .ev-name{font-size:15px}
+  .progress-row{flex-direction:column;gap:10px}
+  .tabs-wrap{padding:16px 14px 0}
+  .container{padding:0 14px 32px}
+  .task-main{padding:12px 14px}
+  .task-detail{padding:0 14px 14px 44px}
+  .people-grid{grid-template-columns:1fr}
+  .login-title{font-size:26px}
+  .login-btn{padding:14px 18px}
+  .budget-section{padding:0 14px}
+  .event-info{padding:0 14px}
+}
+
+/* ── NOTES LOG ── */
+.notes-section{margin-top:16px;border-top:1px solid var(--border);padding-top:16px}
+.notes-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-dim);margin-bottom:12px;
+  display:flex;align-items:center;gap:6px}
+.notes-title span{font-family:var(--mono);font-size:10px;color:var(--text-faint);background:var(--bg-surface);padding:2px 6px;border-radius:4px}
+.notes-log{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+.note-entry{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px 14px;position:relative}
+.note-entry:hover .note-actions{opacity:1}
+.note-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.note-author{font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px}
+.note-author .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.note-time{font-size:11px;font-family:var(--mono);color:var(--text-faint)}
+.note-text{font-size:13px;color:var(--text-muted);line-height:1.6;white-space:pre-line;word-break:break-word}
+.note-actions{display:flex;gap:4px;opacity:0;transition:opacity .15s}
+.note-actions button{background:none;border:none;cursor:pointer;padding:4px 8px;border-radius:4px;font-size:11px;
+  font-family:var(--sans);color:var(--text-dim);transition:all .15s}
+.note-actions button:hover{background:var(--bg-surface);color:var(--text-muted)}
+.note-actions button.del:hover{color:var(--red)}
+.note-attachments{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.note-attach-img{width:80px;height:80px;object-fit:cover;border-radius:8px;border:1px solid var(--border);cursor:pointer;transition:transform .15s}
+.note-attach-img:hover{transform:scale(1.05)}
+.note-attach-file{display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;
+  background:var(--bg-surface);border:1px solid var(--border);font-size:12px;color:var(--text-muted);
+  text-decoration:none;transition:all .15s}
+.note-attach-file:hover{border-color:var(--amber);color:var(--text-secondary)}
+.note-attach-file svg{flex-shrink:0}
+.note-compose{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px 14px}
+.note-compose.editing{border-color:var(--amber)}
+.note-input{width:100%;padding:8px 0;border:none;background:none;color:var(--text-secondary);
+  font-size:13px;font-family:var(--sans);resize:none;min-height:40px;max-height:160px;outline:none;line-height:1.5}
+.note-input::placeholder{color:var(--text-faint)}
+.note-compose-bar{display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding-top:8px;
+  border-top:1px solid #1e293b;flex-wrap:wrap;gap:8px}
+.note-file-label{display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:6px;
+  background:var(--bg-surface);border:1px solid var(--border);font-size:12px;color:var(--text-muted);
+  cursor:pointer;transition:all .15s;font-family:var(--sans)}
+.note-file-label:hover{border-color:var(--text-dim);color:var(--text-secondary)}
+.note-file-label input{display:none}
+.note-compose-actions{display:flex;gap:6px;align-items:center}
+.note-pending-files{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.note-pending-file{display:flex;align-items:center;gap:4px;padding:4px 10px;border-radius:6px;
+  background:var(--amber-dim);font-size:11px;color:var(--amber);font-weight:500}
+.note-pending-file button{background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:14px;padding:0 2px}
+.btn-submit-note{padding:8px 18px;border-radius:8px;border:none;font-size:12px;font-weight:700;
+  cursor:pointer;font-family:var(--sans);background:var(--amber);color:var(--bg);transition:all .2s}
+.btn-submit-note:hover{background:#d97706}
+.btn-submit-note:disabled{opacity:0.4;cursor:not-allowed}
+.btn-cancel-note{padding:8px 14px;border-radius:8px;border:1px solid var(--border);background:none;
+  font-size:12px;font-weight:600;cursor:pointer;font-family:var(--sans);color:var(--text-dim);transition:all .15s}
+.btn-cancel-note:hover{border-color:var(--text-dim);color:var(--text-muted)}
+.note-uploading{font-size:11px;color:var(--amber);display:flex;align-items:center;gap:6px}
+.img-modal{position:fixed;inset:0;background:#000d;z-index:300;display:flex;align-items:center;
+  justify-content:center;cursor:pointer;padding:20px}
+.img-modal img{max-width:95%;max-height:95%;border-radius:8px;object-fit:contain}
+</style>
+</head>
+<body>
+
+<div id="app"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// FIREBASE INIT
+// ═══════════════════════════════════════════════════════════════
+firebase.initializeApp({
+  apiKey: "AIzaSyAuFNgFgicmeqzsYOnr5FolTvT0kDKkyes",
+  authDomain: "deploy-and-chill.firebaseapp.com",
+  databaseURL: "https://deploy-and-chill-default-rtdb.firebaseio.com",
+  projectId: "deploy-and-chill",
+  storageBucket: "deploy-and-chill.firebasestorage.app",
+  messagingSenderId: "519569485617",
+  appId: "1:519569485617:web:df68b5546f36e463e84a10"
+});
+const db = firebase.database();
+const storage = firebase.storage();
+
+// ═══════════════════════════════════════════════════════════════
+// TASK DATA
+// ═══════════════════════════════════════════════════════════════
+const TASKS = {
+  yosh: [
+    // SEMANA 1
+    { id:"Y-01", week:1, title:"Cerrar la encuesta y documentar resultados",
+      due:"2026-05-12",
+      desc:"Cerrar el Google Form. Exportar resultados y documentar:\n• Tipo de actividad ganadora\n• Comida preferida\n• Bebida preferida\n• Día ganador\n• Restricciones alimentarias\n• Cuántos tomarán alcohol vs. no\n\nEstos datos alimentan todas las decisiones de Audelina con los venues." },
+
+    { id:"Y-02", week:1, title:"Dar briefing completo a Audelina",
+      due:"2026-05-12",
+      desc:"Sentarse con Audelina (30 min). Explicarle el concepto del evento, entregarle el plan maestro impreso o digital, y revisar juntos su checklist punto por punto.\n\nAsegurarse de que entienda qué debe preguntar y validar con cada venue. Si Audelina no tiene claro el alcance, las cotizaciones van a venir incompletas." },
+
+    { id:"Y-03", week:1, title:"Decidir el regalo personalizado y ordenar producción",
+      due:"2026-05-16",
+      desc:"Elegir entre las opciones de regalo. Buscar proveedor, pedir muestra si es posible, aprobar diseño, ordenar 25 unidades + 2 extras.\n\n<strong>Opciones evaluadas:</strong>\n• Camiseta negra \"Deploy & Chill 2026\" — Q60–100/pp, 10–14 días\n• Tumbler/botella térmica grabado láser — Q80–120/pp, 7–10 días\n• Kit dev (mousepad + stickers + pin) — Q70–100/pp, 7–10 días\n• Hoodie zip negro con bordado — Q120–180/pp, 14–18 días\n\n<strong>Nota:</strong> Si eliges camiseta o hoodie, necesitas recopilar tallas. Puedes pedirle a Audelina que lo pregunte por WhatsApp." },
+
+    // SEMANA 2
+    { id:"Y-04", week:2, title:"Decidir los premios del torneo", deprecated:true,
+      due:"2026-05-23",
+      desc:"Comprar premios para las categorías:\n\n🏆 <strong>Equipo campeón (4–5 personas):</strong> Gift card individual Q150 (Amazon, Uber Eats, o tienda tech) → Q600–750 total\n🥈 <strong>Segundo lugar:</strong> Gift card individual Q75 → Q300–375 total\n🎯 <strong>MVP (mejor score individual):</strong> Audífonos bluetooth o power bank premium → Q200–300\n😂 <strong>\"404: Pins Not Found\" (último lugar):</strong> Trofeo chistoso o camiseta → Q50–100\n\nTotal estimado en premios: Q1,150–1,525" },
+
+    { id:"Y-05", week:2, title:"Diseñar la invitación digital",
+      due:"2026-05-16",
+      desc:"Crear imagen para WhatsApp/correo en Canva (1600×400px para header, o formato vertical para WhatsApp).\n\n<strong>Debe incluir:</strong>\n• Nombre: Deploy & Chill\n• Fecha: Jueves 4 de junio\n• Hora: 11:00 AM\n• Lugar: CC La Estación, Zona 10\n• Dress code: Casual\n• Incluye almuerzo y bebidas\n• \"Confirma tu asistencia con Audelina\"" },
+
+    { id:"Y-06", week:2, title:"Crear la web app del torneo de boliche", deprecated:true,
+      due:"2026-05-28",
+      desc:"Funcionalidades requeridas:\n• Registro de asistentes el día del evento\n• Generador aleatorio de equipos con nombres temáticos\n• Formato flexible: arma equipos de 4–5 personas según asistentes reales\n• Bracket visual del torneo (automático según cantidad de equipos)\n• Input de scores por ronda desde celular\n• Leaderboard en tiempo real\n• Pantalla de resultados finales (campeón, MVP, \"404 Pins Not Found\")" },
+
+    { id:"Y-07", week:2, title:"Enviar invitación oficial al equipo",
+      due:"2026-05-19",
+      desc:"Canal: WhatsApp grupal + correo electrónico.\n\n<strong>Mensaje sugerido:</strong>\n\"Equipo 🚀 El próximo jueves 4 de junio tenemos un Deploy & Chill — un día fuera de código para todo el equipo GT. Incluye boliche, almuerzo premium con cortes de carne argentinos, y bebidas. Lugar: CC La Estación, Z10. Hora: 11:00 AM. Dress code: casual. Confirma tu asistencia con Audelina antes del viernes 23 de mayo.\"" },
+
+    { id:"Y-08", week:2, title:"Validar cotizaciones de Audelina",
+      due:"2026-05-21",
+      desc:"Revisar las cotizaciones que Audelina consiguió de Futeca y Palermo. Verificar que los números cuadren con el presupuesto de USD $2,500. Aprobar o pedir ajustes." },
+
+    { id:"Y-09", week:2, title:"Aprobar menú final del restaurante",
+      due:"2026-05-23",
+      desc:"Revisar las opciones de menú que Audelina negoció con Palermo. Verificar que haya opciones sin azúcar. Aprobar el menú fijo." },
+
+    // SEMANA 3
+    { id:"Y-10", week:3, title:"Revisar confirmaciones de asistencia",
+      due:"2026-05-26",
+      desc:"Revisar la lista de confirmados que Audelina recopiló. Identificar quién no ha respondido y hacer follow-up personal si es necesario." },
+
+    { id:"Y-11", week:3, title:"Recoger y verificar regalos",
+      due:"2026-05-30",
+      desc:"Recoger los regalos del proveedor. Verificar cantidad (25 + 2 extras), calidad de impresión/grabado, y que todo esté en orden." },
+
+    { id:"Y-12", week:3, title:"Comprar premios del torneo", deprecated:true,
+      due:"2026-05-30",
+      desc:"Si aún no se han adquirido los premios definidos en Y-04, comprarlos esta semana. Tener todo empacado y listo." },
+
+    // SEMANA 4
+    { id:"Y-13", week:4, title:"Probar la web app del torneo", deprecated:true,
+      due:"2026-06-03",
+      desc:"Cargar datos de prueba, simular un torneo completo, verificar que funcione bien en celular. Probar en al menos 2 navegadores diferentes." },
+
+    { id:"Y-14", week:4, title:"Preparar todo la noche anterior",
+      due:"2026-06-03",
+      desc:"Empacar regalos y cualquier material. Verificar que el celular tenga batería. Confirmar hora de llegada con Audelina (10:30 AM en La Estación)." },
+  ],
+
+  audelina: [
+    // SEMANA 1
+    { id:"A-01", week:1, title:"Renegociar paquete con Futeca Bowling",
+      due:"2026-05-12",
+      desc:"Contacto: WhatsApp +502 3758-6118\nUbicación: CC La Estación, La Terraza, 2do nivel, Zona 10\n\n<strong>Ya tenemos cotización aprobada por Q4,020.50 pero necesitamos reducir el paquete.</strong>",
+      script:"Hola, soy Audelina de Affinity Marketing. Ya tenemos una cotización aprobada con ustedes para el jueves 4 de junio. Necesitamos hacer unos ajustes al paquete: reducir a 1 hora de boliche, quitar las pizzas, y bajar de 25 a 20 cervezas. ¿Nos pueden dar un precio actualizado?",
+      questions:[
+        "¿Cuál sería el nuevo precio con estos cambios: 5 pistas × 1 hora, sin pizzas, mantener nachos y gaseosas, 20 cervezas en vez de 25, mantener arcade y salón?",
+        "¿Sigue aplicando el 15% de descuento por reservar en mayo?",
+        "¿Cuál sería el nuevo monto de anticipo?",
+        "¿Necesitamos firmar un contrato nuevo o se modifica el existente?",
+        "¿El alquiler de zapatos sigue incluido?",
+        "¿Permiten llevar bebidas propias (descorche)?",
+        "¿Tienen pantallas donde se pueda proyectar algo? ¿Se puede poner música propia?",
+        "¿El parqueo del centro comercial es gratuito o tiene costo?"
+      ]},
+
+    { id:"A-02", week:1, title:"Confirmar reserva con Restaurante Palermo",
+      due:"2026-05-13",
+      desc:"Contacto: Rosy García — Tel. 37713559 / 50007051\nEjecutivo de ventas: Rigoberto Herrera\nUbicación: CC La Estación, Zona 10\n\n<strong>Ya tenemos la cotización del Menú #2 por Q9,707.50 (25 personas). Necesitamos confirmar la reserva.</strong>",
+      script:"Hola Rosy, soy Audelina de Affinity Marketing. Ya recibimos la cotización del Menú #2 para el jueves 4 de junio y queremos confirmar la reserva. ¿Qué necesitan de nuestra parte para proceder?",
+      questions:[
+        "Confirmar que la fecha (jueves 4 de junio) y el salón La Estación (montaje Imperial, 25 personas) siguen disponibles.",
+        "Confirmar el menú exacto — Menú #2: entradas (empanadas/carpaccio/sopa) + plato fuerte (Vacío 9oz, Lomito 8oz, Salmón del Sur, o Pollo al chimichurri) + postre. ¿Todos pueden elegir libremente cualquier plato fuerte?",
+        "Confirmar las 25 cervezas (Gallo/Light/Moza a Q30 c/u) y el descorche de 4 botellas de vino (Q150 c/u).",
+        "Confirmar postre sin azúcar: copa de yogurt con frutas. ¿Cuántos debemos indicar con anticipación?",
+        "¿Cuál es el monto exacto del anticipo del 40% y los datos bancarios para la transferencia o depósito?",
+        "¿Cuándo necesitan el contrato firmado y sellado?",
+        "Recordar: la hora de servir es 2:00 PM. Nosotros llegamos al salón a la 1:30 PM.",
+        "¿Podemos enviar por correo un archivo para que quede cargado en el Chromecast o TV antes de que lleguemos?",
+        "Confirmar que podemos ingresar un banner (sin adhesivos ni tachuelas, solo en atril o stand).",
+        "Nombre y contacto directo de la persona que nos atenderá el día del evento."
+      ]},
+
+    { id:"A-03", week:1, title:"Backup: cotizar Arena Mediterránea (solo si Palermo no funciona)", deprecated:true,
+      due:"2026-05-14",
+      desc:"<strong>Solo ejecutar si Palermo no tiene disponibilidad o Yosh lo indica.</strong>\n\nBuscar contacto en redes @arena_mediterranea o llamar a CC La Estación.\nHacer las mismas 14 preguntas del punto A-02." },
+
+    // SEMANA 2
+    { id:"A-04", week:2, title:"Dar seguimiento a confirmaciones pendientes",
+      due:"2026-05-19",
+      desc:"Verificar que ambos venues estén confirmados:\n\n• <strong>Futeca:</strong> ¿Ya recibimos el precio actualizado del paquete renegociado? Si no, llamar de nuevo.\n• <strong>Palermo:</strong> ¿Ya se firmó el contrato y se pagó el anticipo del 40%? Si no, coordinar con Yosh.\n\n<strong>No dejar pasar más de una semana sin tener ambas reservas confirmadas por escrito.</strong>" },
+
+    { id:"A-05", week:2, title:"Recopilar confirmaciones de asistencia del equipo",
+      due:"2026-05-23",
+      desc:"Después de que Yosh envíe la invitación (lunes 19), llevar el control de quién confirma.\n\n<strong>Crear una lista con 3 columnas:</strong>\n• Nombre\n• ¿Confirma? (Sí / No / No ha respondido)\n• Restricción alimentaria (si aplica)\n\nEl viernes 23 enviarle a Yosh la lista con el conteo: X confirmados, X pendientes, X no asisten.\n\nSi alguien no ha respondido para el viernes 23, enviarle mensaje directo por WhatsApp." },
+
+    { id:"A-06", week:2, title:"Recopilar tallas del equipo (si aplica)",
+      due:"2026-05-21",
+      desc:"<strong>Solo si Yosh elige camiseta o hoodie como regalo.</strong>\n\nEnviar mensaje por WhatsApp a cada persona preguntando su talla (S, M, L, XL, XXL).\n\nConsolidar en una lista y enviar a Yosh antes del jueves 22." },
+
+    { id:"A-07", week:2, title:"Confirmar detalles finales del menú con Palermo",
+      due:"2026-05-21",
+      desc:"Llamar a Rosy García (37713559) y confirmar:\n\n• Menú #2 (Q299/pp + 10% servicio) para 25 personas\n• Cantidad de personas que necesitan postre sin azúcar (copa de yogurt con frutas)\n• Hora de llegada al salón: 1:30 PM, hora de servir: 2:00 PM\n• Forma de pago del saldo restante (60%) — ¿tarjeta corporativa, transferencia, o efectivo?\n• Confirmar que el Chromecast y la TV de 96\" estarán listos\n\n<strong>Pedir confirmación por escrito de todo lo anterior.</strong>" },
+
+    // SEMANA 3
+    { id:"A-08", week:3, title:"Confirmar reserva del boliche con headcount actualizado",
+      due:"2026-05-26",
+      desc:"Llamar a Futeca y confirmar:\n\n• Cantidad de personas confirmadas hasta el momento\n• Hora de llegada (11:00 AM) y salida estimada (1:30 PM)\n• Que las pistas estén reservadas y listas\n• Confirmar qué snacks/bebidas se van a pedir\n• Preguntar si necesitan pago parcial o total antes del evento" },
+
+    { id:"A-09", week:3, title:"Confirmar reserva del restaurante con headcount actualizado",
+      due:"2026-05-26",
+      desc:"Llamar a Palermo y confirmar:\n\n• Cantidad de personas confirmadas\n• Que el área/mesa está reservada\n• Recordar las restricciones alimentarias\n• Confirmar hora de llegada (1:30 PM)" },
+
+    { id:"A-10", week:3, title:"Enviar recordatorio al equipo",
+      due:"2026-05-29",
+      desc:"Enviar mensaje por WhatsApp al grupo:\n\n\"Recordatorio 🚀 El próximo jueves 4 de junio es nuestro Deploy & Chill. Nos vemos a las 11:00 AM en Futeca Bowling, La Terraza, 2do nivel de CC La Estación, Zona 10. Dress code: casual. ¡No falten!\"\n\n<strong>Incluir:</strong> Ubicación de Google Maps del centro comercial." },
+
+    // SEMANA 4
+    { id:"A-11", week:4, title:"Confirmación final con Futeca Bowling",
+      due:"2026-06-03",
+      desc:"Llamar y confirmar un día antes:\n\n• \"Mañana jueves 4 llegamos a las 11:00 AM, somos X personas\"\n• Que las pistas estén listas y reservadas\n• Que los snacks estén coordinados\n• Nombre de la persona que nos va a recibir\n• Confirmar forma de pago final" },
+
+    { id:"A-12", week:4, title:"Confirmación final con Restaurante Palermo",
+      due:"2026-06-03",
+      desc:"Llamar y confirmar un día antes:\n\n• \"Mañana jueves 4 llegamos aprox. a la 1:30 PM, somos X personas\"\n• Confirmar menú y restricciones alimentarias\n• Confirmar que el área está reservada\n• Nombre del mesero o encargado que nos va a atender\n• Confirmar forma de pago" },
+
+    { id:"A-13", week:4, title:"Preparar lista final de asistentes",
+      due:"2026-06-03",
+      desc:"Enviarle a Yosh la lista final de quiénes confirmaron que sí van.\n\nEsta lista se usa para:\n• Saber cuántos regalos llevar\n• Ajustar cantidad de comida/bebida con ambos venues" },
+
+    // DIA DEL EVENTO
+    { id:"A-14", week:5, title:"Llegar temprano con Yosh a La Estación",
+      due:"2026-06-04",
+      desc:"Hora: 10:30 AM\n\n• Llegar a CC La Estación\n• Subir a Futeca Bowling, ubicar al contacto, verificar pistas listas\n• Dejar regalos en lugar seguro dentro del boliche\n• Coordinar con staff dónde se sienta el grupo, dónde van los snacks\n• Bajar a verificar que la mesa en Palermo esté lista para la 1:30 PM" },
+
+    { id:"A-15", week:5, title:"Coordinar durante el evento",
+      due:"2026-06-04",
+      desc:"<strong>11:00–12:30 (Boliche):</strong>\n• Coordinar que los snacks se sirvan a tiempo\n• Asegurarse de que todos tengan zapatos\n• Estar pendiente de si falta algo\n\n<strong>13:15–16:00 (Almuerzo Palermo):</strong>\n• Coordinar con el mesero que los platos salgan en orden\n• Monitorear la cuenta de bebidas si es cuenta abierta con tope\n• Pedir la cuenta cuando Yosh indique" },
+
+    { id:"A-16", week:5, title:"Cierre administrativo",
+      due:"2026-06-05",
+      desc:"<strong>Viernes 5 de junio:</strong>\n\n• Recopilar facturas de Futeca y Palermo\n• Consolidar gasto total del evento\n• Entregar reporte de gastos a Yosh" },
+  ]
+};
+
+const WEEKS = {
+  1: { label:"Semana 1", range:"Mayo 8 – 14" },
+  2: { label:"Semana 2", range:"Mayo 18 – 23" },
+  3: { label:"Semana 3", range:"Mayo 25 – 30" },
+  4: { label:"Semana 4", range:"Junio 1 – 3" },
+  5: { label:"Día del evento", range:"Junio 4 – 5" }
+};
+
+const BUDGET = [
+  ["Bowling 1890 Oakland Place","Q3,000","$393"],
+  ["Don Emiliano ~Q350/pp × 25","Q8,750","$1,147"],
+  ["12% servicio Don Emiliano","Q1,050","$138"],
+  ["Regalos playera × 25 (Q100/pp)","Q2,500","$328"],
+  ["Detalle extra (lapicero/llavero)","Q500","$66"],
+  ["Logística / imprevistos","Q500","$66"],
+];
+
+const AGENDA = [
+  ["11:00","Yosh y Audelina llegan a Oakland, verifican todo"],
+  ["11:30","Llegada del equipo a 1890 Bowling, entrega de regalos"],
+  ["11:45","Bienvenida breve + entrega de zapatos"],
+  ["12:00","Boliche libre — 1 hora, cada quien a su ritmo"],
+  ["13:00","Fin del boliche"],
+  ["13:15","Traslado a Don Emiliano (Rooftop Oakland Mall, caminando)"],
+  ["13:30","Almuerzo — menú individual, cada quien elige"],
+  ["15:00","Brindis + palabras del director"],
+  ["15:30","Sobremesa y convivencia libre"],
+  ["16:00","Cierre"],
+];
+
+// ═══════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════
+let STATE = {
+  user: localStorage.getItem("dc_user") || null,
+  activeTab: null,
+  expanded: {},
+  taskData: {},
+  budgetOpen: false,
+  editingNote: null, // { taskId, noteId }
+  pendingFiles: {},  // { taskId: [File, ...] }
+  uploading: false,
+  imageModal: null,
+  orders: {},
+  ordersSubTab: "cocina",
+  addingExtra: null,
+};
+
+// ═══════════════════════════════════════════════════════════════
+// FIREBASE SYNC
+// ═══════════════════════════════════════════════════════════════
+const DB_BASE = "deploy_and_chill_2026";
+const STORAGE_BASE = "deploy_and_chill_2026";
+
+function initFirebase() {
+  db.ref(DB_BASE + "/tasks").on("value", snap => {
+    STATE.taskData = snap.val() || {};
+    render();
+  });
+  db.ref(DB_BASE + "/orders").on("value", snap => {
+    STATE.orders = snap.val() || {};
+    render();
+  });
+}
+
+function toggleTask(id) {
+  const current = STATE.taskData[id]?.done || false;
+  db.ref(DB_BASE + "/tasks/" + id).update({
+    done: !current,
+    doneAt: !current ? new Date().toISOString() : null,
+    doneBy: !current ? STATE.user : null
+  });
+}
+
+// ── NOTES CRUD ──
+async function submitNote(taskId) {
+  const textarea = document.getElementById("note-input-" + taskId);
+  const text = textarea?.value?.trim();
+  if (!text && !(STATE.pendingFiles[taskId]?.length)) return;
+
+  STATE.uploading = true;
+  render();
+
+  try {
+    let attachments = [];
+    const files = STATE.pendingFiles[taskId] || [];
+    for (const file of files) {
+      const ts = Date.now();
+      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+      const path = STORAGE_BASE + "/" + taskId + "/" + ts + "_" + safeName;
+      const ref = storage.ref(path);
+      await ref.put(file);
+      const url = await ref.getDownloadURL();
+      attachments.push({ name: file.name, url, type: file.type, path });
+    }
+
+    if (STATE.editingNote?.taskId === taskId) {
+      // Editing existing note
+      const noteId = STATE.editingNote.noteId;
+      const existing = STATE.taskData[taskId]?.notes?.[noteId];
+      const oldAttachments = existing?.attachments || [];
+      db.ref(DB_BASE + "/tasks/" + taskId + "/notes/" + noteId).update({
+        text: text || "",
+        editedAt: new Date().toISOString(),
+        attachments: [...oldAttachments, ...attachments]
+      });
+      STATE.editingNote = null;
+    } else {
+      // New note
+      const noteId = "n" + Date.now() + Math.random().toString(36).slice(2, 6);
+      db.ref(DB_BASE + "/tasks/" + taskId + "/notes/" + noteId).set({
+        text: text || "",
+        author: STATE.user,
+        timestamp: new Date().toISOString(),
+        attachments
+      });
+    }
+    STATE.pendingFiles[taskId] = [];
+  } catch (e) {
+    console.error("Error saving note:", e);
+    alert("Error al guardar. Intenta de nuevo.");
+  }
+  STATE.uploading = false;
+  render();
+}
+
+function startEditNote(taskId, noteId) {
+  STATE.editingNote = { taskId, noteId };
+  render();
+  setTimeout(() => {
+    const ta = document.getElementById("note-input-" + taskId);
+    if (ta) { ta.focus(); ta.selectionStart = ta.value.length; }
+  }, 50);
+}
+
+function cancelEdit(taskId) {
+  STATE.editingNote = null;
+  STATE.pendingFiles[taskId] = [];
+  render();
+}
+
+function deleteNote(taskId, noteId) {
+  if (!confirm("¿Eliminar esta nota?")) return;
+  const note = STATE.taskData[taskId]?.notes?.[noteId];
+  if (note?.attachments) {
+    note.attachments.forEach(att => {
+      if (att.path) storage.ref(att.path).delete().catch(() => {});
+    });
+  }
+  db.ref(DB_BASE + "/tasks/" + taskId + "/notes/" + noteId).remove();
+}
+
+function removeAttachment(taskId, noteId, idx) {
+  if (!confirm("¿Eliminar este archivo?")) return;
+  const note = STATE.taskData[taskId]?.notes?.[noteId];
+  if (!note?.attachments) return;
+  const att = note.attachments[idx];
+  if (att?.path) storage.ref(att.path).delete().catch(() => {});
+  const updated = [...note.attachments];
+  updated.splice(idx, 1);
+  db.ref(DB_BASE + "/tasks/" + taskId + "/notes/" + noteId).update({ attachments: updated });
+}
+
+function handleFileSelect(taskId, input) {
+  if (!input.files.length) return;
+  if (!STATE.pendingFiles[taskId]) STATE.pendingFiles[taskId] = [];
+  for (const f of input.files) {
+    if (f.size > 10 * 1024 * 1024) { alert(f.name + " excede 10MB"); continue; }
+    STATE.pendingFiles[taskId].push(f);
+  }
+  input.value = "";
+  render();
+}
+
+function removePendingFile(taskId, idx) {
+  STATE.pendingFiles[taskId].splice(idx, 1);
+  render();
+}
+
+function showImage(url) { STATE.imageModal = url; render(); }
+function closeImage() { STATE.imageModal = null; render(); }
+
+// ═══════════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════════
+function esc(s) { const d=document.createElement("div");d.textContent=s;return d.innerHTML; }
+function today() { return new Date().toISOString().slice(0,10); }
+function daysUntil(d) { return Math.floor((new Date(d)-new Date())/86400000); }
+function fmtDate(d) { return new Date(d+"T12:00:00").toLocaleDateString("es",{weekday:"short",day:"numeric",month:"short"}); }
+
+function getWeekNum() {
+  const t = today();
+  if (t <= "2026-05-14") return 1;
+  if (t <= "2026-05-23") return 2;
+  if (t <= "2026-05-30") return 3;
+  if (t <= "2026-06-03") return 4;
+  return 5;
+}
+
+function taskBadge(due, done) {
+  if (done) return '<span class="task-badge badge-done">Completada</span>';
+  const d = daysUntil(due);
+  if (d < 0) return '<span class="task-badge badge-overdue">Vencida ' + Math.abs(d) + 'd</span>';
+  if (d <= 2) return '<span class="task-badge badge-soon">' + d + 'd restantes</span>';
+  return '';
+}
+
+function pct(tasks) {
+  const active = tasks.filter(t => !t.deprecated);
+  if (!active.length) return 0;
+  const done = active.filter(t => STATE.taskData[t.id]?.done).length;
+  return Math.round((done / active.length) * 100);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════════════════════
+function render() {
+  const { user, activeTab, expanded, taskData, budgetOpen } = STATE;
+
+  // LOGIN SCREEN
+  if (!user) {
+    document.getElementById("app").innerHTML = `
+      <div class="login-screen">
+        <div class="login-box">
+          <div class="login-logo">Affinity Dev Team</div>
+          <div class="login-title">Deploy & Chill</div>
+          <div class="login-sub">Tracker del evento — Jueves 4 de junio 2026</div>
+          <span class="login-label">¿Quién eres?</span>
+          <div class="login-btns">
+            <button class="login-btn" onclick="login('yosh')">
+              <div class="avatar y">JU</div>
+              <div><div>Josué Ubico</div><div class="role">Director de Desarrollo — Vista completa</div></div>
+            </button>
+            <button class="login-btn" onclick="login('audelina')">
+              <div class="avatar a">AN</div>
+              <div><div>Audelina Najera</div><div class="role">Asistente Administrativa — Mi checklist</div></div>
+            </button>
+          </div>
+        </div>
+      </div>`;
+    return;
+  }
+
+  const isYosh = user === "yosh";
+  const tab = activeTab || (isYosh ? "yosh" : "audelina");
+  const currentWeek = getWeekNum();
+
+  // Determine visible tabs and tasks
+  const tabs = isYosh ? ["yosh","audelina","ordenes"] : ["audelina"];
+  const tasks = tab !== "ordenes" ? TASKS[tab] : null;
+  const yoshPct = pct(TASKS.yosh);
+  const audelinaPct = pct(TASKS.audelina);
+  const allTasks = [...TASKS.yosh, ...TASKS.audelina];
+  const globalPct = pct(allTasks);
+
+  let html = '';
+
+  // TOPBAR
+  html += `<div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-logo">DC</div>
+      <div class="topbar-text">
+        <div class="ev-name">Deploy & Chill</div>
+        <div class="ev-date">Jueves 4 de junio 2026</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="topbar-user">
+        <span class="dot" style="background:${isYosh?'var(--amber)':'var(--emerald)'}"></span>
+        ${isYosh ? 'Josué Ubico' : 'Audelina Najera'}
+      </div>
+      <button class="btn-logout" onclick="logout()">Salir</button>
+    </div>
+  </div>`;
+
+  // PROGRESS
+  html += `<div class="progress-global"><div class="progress-row">`;
+  if (isYosh) {
+    html += `<div class="progress-item">
+      <div class="label">Progreso Global</div>
+      <div class="bar-wrap"><div class="bar-fill amber" style="width:${globalPct}%"></div></div>
+      <div class="pct">${globalPct}% completado</div>
+    </div>
+    <div class="progress-item">
+      <div class="label">Yosh</div>
+      <div class="bar-wrap"><div class="bar-fill amber" style="width:${yoshPct}%"></div></div>
+      <div class="pct">${yoshPct}%</div>
+    </div>
+    <div class="progress-item">
+      <div class="label">Audelina</div>
+      <div class="bar-wrap"><div class="bar-fill emerald" style="width:${audelinaPct}%"></div></div>
+      <div class="pct">${audelinaPct}%</div>
+    </div>`;
+  } else {
+    html += `<div class="progress-item">
+      <div class="label">Mi progreso</div>
+      <div class="bar-wrap"><div class="bar-fill emerald" style="width:${audelinaPct}%"></div></div>
+      <div class="pct">${audelinaPct}% completado — ${TASKS.audelina.filter(t=>!t.deprecated && taskData[t.id]?.done).length} de ${TASKS.audelina.filter(t=>!t.deprecated).length} tareas</div>
+    </div>`;
+  }
+  html += `</div></div>`;
+
+  // TABS
+  if (tabs.length > 1) {
+    html += `<div class="tabs-wrap">`;
+    tabs.forEach(t => {
+      const label = t === "yosh" ? "Yosh" : t === "audelina" ? "Audelina" : "Órdenes";
+      const count = t === "ordenes" ? Object.keys(STATE.orders).length : TASKS[t].filter(tk => !tk.deprecated && !taskData[tk.id]?.done).length;
+      const countLabel = t === "ordenes" ? count + " órdenes" : count + " pendientes";
+      html += `<button class="tab-btn ${tab===t?'active':''}" onclick="switchTab('${t}')">
+        ${label}<span class="tab-count">${countLabel}</span>
+      </button>`;
+    });
+    html += `</div>`;
+  }
+
+  // CONTENT
+  if (tab === "ordenes") {
+    html += renderOrdersView();
+  } else {
+
+  // CHECKLIST
+  html += `<div class="container"><div class="checklist-wrap" style="${tabs.length<=1?'border-radius:12px':''}">`;
+
+  const weeks = [...new Set(tasks.map(t => t.week))];
+  weeks.forEach(w => {
+    const wk = WEEKS[w];
+    const weekTasks = tasks.filter(t => t.week === w);
+    const weekDone = weekTasks.filter(t => taskData[t.id]?.done).length;
+    const isCurrent = w === currentWeek;
+
+    html += `<div class="week-header ${isCurrent?'week-current':''}">
+      <div class="week-title">${wk.label} <span>${wk.range}</span></div>
+      <div class="week-count">${weekDone}/${weekTasks.length}</div>
+    </div>`;
+
+    weekTasks.forEach(t => {
+      const isDone = t.deprecated || taskData[t.id]?.done || false;
+      const isDeprecated = t.deprecated || false;
+      const isExp = !isDeprecated && (expanded[t.id] || false);
+      const taskNotes = taskData[t.id]?.notes || {};
+      const badge = isDeprecated ? '<span class="task-badge" style="background:#ffffff08;color:var(--text-faint)">Descartada</span>' : taskBadge(t.due, isDone);
+
+      html += `<div class="task ${isDone?'done':''} ${isDeprecated?'deprecated':''} ${isExp?'expanded':''}">
+        <div class="task-main">
+          <div class="task-check ${isDone?'done':''}" ${isDeprecated?'':`onclick="event.stopPropagation();toggleTask('${t.id}')"`}>
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7l3 3 5-6" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="task-body" ${isDeprecated?'':`onclick="toggleExpand('${t.id}')"`}>
+            <div class="task-top">
+              <span class="task-code">${t.id}</span>
+              <span class="task-title">${esc(t.title)}</span>
+            </div>
+            <div class="task-meta">
+              <span class="task-date">${fmtDate(t.due)}</span>
+              ${badge}
+            </div>
+          </div>
+          ${isDeprecated?'':`<svg class="task-chevron" onclick="toggleExpand('${t.id}')" width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <path d="M7 5l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>`}
+        </div>
+        ${isExp ? renderDetail(t, taskNotes) : ''}
+      </div>`;
+    });
+  });
+
+  html += `</div></div>`;
+
+  } // end checklist else
+
+  // EVENT INFO
+  html += `<div class="event-info"><div class="event-card">
+    <h3>Agenda del día — Jueves 4 de junio</h3>
+    ${AGENDA.map(([time, what]) => `<div class="agenda-row"><span class="agenda-time">${time}</span><span class="agenda-what">${esc(what)}</span></div>`).join('')}
+  </div></div>`;
+
+  // BUDGET
+  html += `<div class="budget-section">
+    <button class="budget-toggle" onclick="toggleBudget()">
+      Presupuesto estimado <span class="budget-total">~Q16,300 · USD $2,138</span>
+    </button>
+    <div class="budget-body ${budgetOpen?'open':''}">
+      <table class="budget-table">
+        <thead><tr><th>Rubro</th><th>Q</th><th>USD</th></tr></thead>
+        <tbody>
+          ${BUDGET.map(([r,q,u]) => `<tr><td>${esc(r)}</td><td>${q}</td><td>${u}</td></tr>`).join('')}
+          <tr><td>TOTAL ESTIMADO</td><td>~Q16,300</td><td>$2,138</td></tr>
+          <tr><td>Sobrante</td><td class="sobrante">~Q2,775</td><td class="sobrante">$364</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>`;
+
+  // FOOTER
+  html += `<div class="footer"><p>Deploy & Chill 2026 · Affinity Marketing International · Dirección de Desarrollo</p></div>`;
+
+  // IMAGE MODAL
+  if (STATE.imageModal) {
+    html += `<div style="position:fixed;inset:0;background:#000d;z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;cursor:pointer" onclick="closeImage()">
+      <img src="${STATE.imageModal}" style="max-width:90vw;max-height:90vh;border-radius:12px;box-shadow:0 8px 40px #0006" onclick="event.stopPropagation()" />
+      <button style="position:absolute;top:20px;right:24px;background:none;border:none;color:#fff;font-size:28px;cursor:pointer">✕</button>
+    </div>`;
+  }
+
+  document.getElementById("app").innerHTML = html;
+}
+
+function renderDetail(t, notes) {
+  const isEditing = STATE.editingNote?.taskId === t.id;
+  const editNoteId = STATE.editingNote?.noteId;
+  const editNoteData = editNoteId ? notes[editNoteId] : null;
+  const pendingFiles = STATE.pendingFiles[t.id] || [];
+  const noteEntries = Object.entries(notes || {}).filter(([k]) => k.startsWith("n")).sort((a,b) => (a[1].timestamp||"") > (b[1].timestamp||"") ? 1 : -1);
+  const authorName = (a) => a === "yosh" ? "Josué Ubico" : a === "audelina" ? "Audelina Najera" : a || "—";
+  const fmtTs = (ts) => { try { return new Date(ts).toLocaleDateString("es",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}) } catch { return ts } };
+  const isImage = (type) => type && type.startsWith("image/");
+
+  let html = '<div class="task-detail">';
+
+  if (t.desc) {
+    html += '<div class="task-desc">' + t.desc + '</div>';
+  }
+
+  if (t.script) {
+    html += '<div class="task-script"><div class="task-script-title">Qué decir al llamar</div><div class="task-script-body">"' + esc(t.script) + '"</div></div>';
+  }
+
+  if (t.questions && t.questions.length) {
+    html += '<div class="task-questions"><div class="task-questions-title">Preguntas que debe hacer (anotar cada respuesta)</div><ol>' + t.questions.map(function(q){ return '<li>' + esc(q) + '</li>' }).join('') + '</ol></div>';
+  }
+
+  // ── BITÁCORA ──
+  html += '<div class="task-notes-wrap"><div class="task-notes-label">Bitácora</div>';
+
+  // Existing notes
+  if (noteEntries.length) {
+    noteEntries.forEach(function(entry) {
+      var nId = entry[0], n = entry[1];
+      var isAuthorY = n.author === "yosh";
+      var dotColor = isAuthorY ? "var(--amber)" : "var(--emerald)";
+      html += '<div class="note-entry"><div class="note-entry-header">';
+      html += '<div class="note-author"><span class="note-dot" style="background:' + dotColor + '"></span>';
+      html += '<span class="note-author-name">' + esc(authorName(n.author)) + '</span>';
+      html += '<span class="note-time">' + fmtTs(n.timestamp) + '</span>';
+      if (n.editedAt) html += '<span class="note-time">(editada)</span>';
+      html += '</div>';
+      html += '<div class="note-actions">';
+      html += '<button class="edit" onclick="event.stopPropagation();startEditNote(\'' + t.id + '\',\'' + nId + '\')" title="Editar">✎</button>';
+      html += '<button class="del" onclick="event.stopPropagation();deleteNote(\'' + t.id + '\',\'' + nId + '\')" title="Eliminar">✕</button>';
+      html += '</div></div>';
+      if (n.text) html += '<div class="note-text">' + esc(n.text) + '</div>';
+      if (n.attachments && n.attachments.length) {
+        html += '<div class="note-attachments">';
+        n.attachments.forEach(function(att, idx) {
+          if (isImage(att.type)) {
+            html += '<img class="note-attach-img" src="' + att.url + '" alt="' + esc(att.name) + '" onclick="event.stopPropagation();showImage(\'' + att.url + '\')" />';
+          } else {
+            html += '<a class="note-attach-file" href="' + att.url + '" target="_blank" rel="noopener" onclick="event.stopPropagation()">';
+            html += '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 1h5l4 4v8H3V1z" stroke="currentColor" stroke-width="1.5"/><path d="M8 1v4h4" stroke="currentColor" stroke-width="1.5"/></svg>';
+            html += esc(att.name) + '</a>';
+          }
+        });
+        html += '</div>';
+      }
+      html += '</div>';
+    });
+  }
+
+  // Compose area
+  html += '<div class="note-compose ' + (isEditing ? "editing" : "") + '">';
+  html += '<textarea id="note-input-' + t.id + '" class="note-input" placeholder="' + (isEditing ? 'Editando nota...' : 'Escribe una nota, observación o adjunta un archivo...') + '" onclick="event.stopPropagation()">' + (isEditing && editNoteData ? esc(editNoteData.text || "") : "") + '</textarea>';
+
+  // Pending files preview
+  if (pendingFiles.length) {
+    html += '<div class="note-pending-files">';
+    pendingFiles.forEach(function(f, idx) {
+      html += '<span class="note-pending-file">' + esc(f.name) + '<button onclick="event.stopPropagation();removePendingFile(\'' + t.id + '\',' + idx + ')">✕</button></span>';
+    });
+    html += '</div>';
+  }
+
+  html += '<div class="note-compose-bar">';
+  html += '<label class="note-file-label" onclick="event.stopPropagation()">';
+  html += '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg> Adjuntar';
+  html += '<input type="file" multiple accept="image/*,.pdf,.doc,.docx,.xlsx,.xls" onchange="handleFileSelect(\'' + t.id + '\',this)" />';
+  html += '</label>';
+  html += '<div class="note-compose-actions">';
+  if (isEditing) {
+    html += '<button class="btn-cancel-note" onclick="event.stopPropagation();cancelEdit(\'' + t.id + '\')">Cancelar</button>';
+  }
+  html += '<button class="btn-submit-note" onclick="event.stopPropagation();submitNote(\'' + t.id + '\')"' + (STATE.uploading ? ' disabled' : '') + '>';
+  html += STATE.uploading ? 'Guardando...' : (isEditing ? 'Actualizar' : 'Guardar');
+  html += '</button>';
+  html += '</div></div></div>';
+
+  html += '</div>'; // task-notes-wrap
+  html += '</div>'; // task-detail
+  return html;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ACTIONS
+// ═══════════════════════════════════════════════════════════════
+function login(who) {
+  STATE.user = who;
+  STATE.activeTab = who === "yosh" ? "yosh" : "audelina";
+  localStorage.setItem("dc_user", who);
+  initFirebase();
+  render();
+}
+
+function logout() {
+  STATE.user = null;
+  STATE.activeTab = null;
+  localStorage.removeItem("dc_user");
+  render();
+}
+
+function switchTab(t) {
+  STATE.activeTab = t;
+  STATE.expanded = {};
+  render();
+}
+
+function toggleExpand(id) {
+  STATE.expanded[id] = !STATE.expanded[id];
+  render();
+}
+
+function toggleBudget() {
+  STATE.budgetOpen = !STATE.budgetOpen;
+  render();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ORDERS
+// ═══════════════════════════════════════════════════════════════
+const EXTRA_ITEMS = {
+  bebida: [
+    {name:"Limonada",price:19.50},{name:"Naranjada",price:19.50},{name:"Gaseosa",price:15.50},
+    {name:"Cerveza Nacional",price:28.50},{name:"Cerveza Importada",price:32.50},
+    {name:"El Príncipe Gris",price:38.50},{name:"El Zapote",price:35.50},
+    {name:"Copa de Vino Tinto",price:44.50},{name:"Copa de Vino Blanco",price:38.50},
+    {name:"Copa de Vino Rosé",price:38.50},{name:"Sangría",price:39.50},
+    {name:"Aperol Spritz",price:49.50},{name:"Zacapa Mojito",price:50.50},
+    {name:"Margarita",price:48.50},{name:"Hendricks & Tonic",price:52.50},
+  ],
+  postre: [
+    {name:"Volcán de Chocolate",price:55},{name:"Tiramisú a la Naranja",price:45},
+    {name:"Dúo de Flanes",price:55},{name:"Pan de Zuccini",price:45},
+    {name:"Cheese Cake Sorpresa",price:65},
+  ],
+  cafe: [
+    {name:"Americano",price:15},{name:"Espresso",price:15},{name:"Capuchino",price:20},
+    {name:"Latte",price:20},{name:"Cortadito",price:15},
+  ]
+};
+
+function setOrdersSubTab(t){STATE.ordersSubTab=t;render()}
+
+function deleteOrder(id){
+  if(!confirm("¿Eliminar la orden de esta persona?"))return;
+  db.ref(DB_BASE+"/orders/"+id).remove();
+}
+
+function addExtra(orderId,type){STATE.addingExtra={orderId,type};render()}
+function cancelExtra(){STATE.addingExtra=null;render()}
+
+function confirmExtra(orderId,item){
+  const ref=db.ref(DB_BASE+"/orders/"+orderId+"/extras");
+  ref.once("value",snap=>{
+    const extras=snap.val()||[];
+    extras.push({type:item.type||STATE.addingExtra.type,name:item.name,price:item.price});
+    ref.set(extras);
+    STATE.addingExtra=null;
+    render();
+  });
+}
+
+function removeExtra(orderId,idx){
+  const ref=db.ref(DB_BASE+"/orders/"+orderId+"/extras");
+  ref.once("value",snap=>{
+    const extras=snap.val()||[];
+    extras.splice(idx,1);
+    ref.set(extras);
+  });
+}
+
+function orderTotal(o){
+  let t=0;
+  if(o.bebida)t+=o.bebida.price||0;
+  if(o.entrada)t+=o.entrada.price||0;
+  if(o.platoFuerte)t+=o.platoFuerte.price||0;
+  if(o.postre)t+=o.postre.price||0;
+  if(o.cafe)t+=o.cafe.price||0;
+  if(o.extras)o.extras.forEach(e=>t+=e.price||0);
+  return t;
+}
+
+function renderOrdersView(){
+  const orders=STATE.orders;
+  const entries=Object.entries(orders).sort((a,b)=>(a[1].name||"").localeCompare(b[1].name||""));
+  const subtab=STATE.ordersSubTab;
+
+  let h=`<div class="orders-wrap">`;
+  h+=`<div class="orders-subtabs">
+    <button class="orders-subtab ${subtab==="cocina"?"active":""}" onclick="setOrdersSubTab('cocina')">Resumen Cocina</button>
+    <button class="orders-subtab ${subtab==="persona"?"active":""}" onclick="setOrdersSubTab('persona')">Por Persona</button>
+  </div>`;
+
+  if(!entries.length){
+    h+=`<div style="text-align:center;padding:60px 20px;color:var(--text-dim)">
+      <div style="font-size:40px;margin-bottom:12px">🍽️</div>
+      <div style="font-size:14px">Aún no hay órdenes</div>
+      <div style="font-size:12px;margin-top:4px;color:var(--text-faint)">Las órdenes aparecerán aquí cuando el equipo las envíe desde el menú</div>
+    </div>`;
+    h+=`</div>`;return h;
+  }
+
+  if(subtab==="cocina") h+=renderCocinaTab(entries);
+  else h+=renderPersonaTab(entries);
+
+  // Account
+  let subtotalMenu=0,subtotalExtras=0;
+  entries.forEach(([id,o])=>{
+    let base=0;
+    if(o.bebida)base+=o.bebida.price||0;
+    if(o.entrada)base+=o.entrada.price||0;
+    if(o.platoFuerte)base+=o.platoFuerte.price||0;
+    if(o.postre)base+=o.postre.price||0;
+    if(o.cafe)base+=o.cafe.price||0;
+    subtotalMenu+=base;
+    if(o.extras)o.extras.forEach(e=>subtotalExtras+=e.price||0);
+  });
+  const subtotal=subtotalMenu+subtotalExtras;
+  const servicio=subtotal*0.12;
+  const total=subtotal+servicio;
+  const propina=subtotal*0.10;
+  const gran=total+propina;
+
+  h+=`<div class="orders-account">
+    <div class="orders-account-title">💰 Cuenta</div>
+    <div class="orders-account-row"><span>Subtotal menú (${entries.length} personas)</span><span class="val">Q${subtotalMenu.toFixed(2)}</span></div>
+    ${subtotalExtras>0?`<div class="orders-account-row"><span>Extras (bebidas/postres/cafés adicionales)</span><span class="val">Q${subtotalExtras.toFixed(2)}</span></div>`:""}
+    <div class="orders-account-row"><span>Subtotal</span><span class="val">Q${subtotal.toFixed(2)}</span></div>
+    <div class="orders-account-row"><span>12% Servicio</span><span class="val">Q${servicio.toFixed(2)}</span></div>
+    <div class="orders-account-row total"><span>TOTAL</span><span>Q${total.toFixed(2)}</span></div>
+    <div class="orders-account-row" style="margin-top:12px;border-top:1px solid var(--border);padding-top:8px">
+      <span style="color:var(--amber)">Propina sugerida 10%</span><span class="val" style="color:var(--amber)">Q${propina.toFixed(2)}</span>
+    </div>
+    <div class="orders-account-row total" style="border-top-color:var(--emerald)"><span style="color:var(--emerald)">GRAN TOTAL</span><span style="color:var(--emerald)">Q${gran.toFixed(2)}</span></div>
+  </div>`;
+
+  h+=`</div>`;
+
+  // Extra modal
+  if(STATE.addingExtra){
+    const ae=STATE.addingExtra;
+    const items=EXTRA_ITEMS[ae.type]||[];
+    const typeLabel=ae.type==="bebida"?"Bebida":ae.type==="postre"?"Postre":"Café";
+    h+=`<div class="extra-modal" onclick="cancelExtra()">
+      <div class="extra-modal-box" onclick="event.stopPropagation()">
+        <div class="extra-modal-title">Agregar ${typeLabel} Extra</div>
+        ${items.map(item=>`<div class="extra-modal-opt" onclick="confirmExtra('${ae.orderId}',${JSON.stringify(item).replace(/"/g,'&quot;')})">
+          <div class="option-name">${esc(item.name)}</div>
+          <div class="option-desc">Q${item.price.toFixed(2)}</div>
+        </div>`).join("")}
+        <button class="extra-modal-cancel" onclick="cancelExtra()">Cancelar</button>
+      </div>
+    </div>`;
+  }
+
+  return h;
+}
+
+function renderCocinaTab(entries){
+  const groups={bebida:{},entrada:{},platoFuerte:{},guarnicion:{},postre:{},cafe:{}};
+  entries.forEach(([id,o])=>{
+    ["bebida","entrada","platoFuerte","postre","cafe"].forEach(k=>{
+      if(o[k]){const n=o[k].name+(o[k].detail?" ("+o[k].detail+")":"");groups[k][n]=(groups[k][n]||0)+1}
+    });
+    if(o.guarnicion){groups.guarnicion[o.guarnicion]=(groups.guarnicion[o.guarnicion]||0)+1}
+    if(o.extras)o.extras.forEach(e=>{const k=e.type||"bebida";const n=e.name+" (extra)";groups[k][n]=(groups[k][n]||0)+1});
+  });
+
+  const labels={bebida:"Bebidas",entrada:"Entradas",platoFuerte:"Platos Fuertes",guarnicion:"Guarniciones",postre:"Postres",cafe:"Cafés"};
+  let h="";
+  Object.entries(labels).forEach(([k,label])=>{
+    const items=Object.entries(groups[k]).sort((a,b)=>b[1]-a[1]);
+    if(!items.length)return;
+    h+=`<div class="orders-group-title">${label}</div>`;
+    items.forEach(([name,count])=>{
+      h+=`<div class="orders-group-row"><span>${esc(name)}</span><span class="count">${count}</span></div>`;
+    });
+  });
+  return h;
+}
+
+function renderPersonaTab(entries){
+  let h="";
+  entries.forEach(([id,o])=>{
+    const isExpanded=STATE.expanded["order_"+id];
+    h+=`<div class="order-card">
+      <div class="order-card-header" onclick="STATE.expanded['order_${id}']=!STATE.expanded['order_${id}'];render()">
+        <span class="order-card-name">${esc(o.name||"Sin nombre")}</span>
+        <div class="order-card-actions">
+          <span style="font-size:12px;font-family:var(--mono);color:var(--text-dim)">Q${orderTotal(o).toFixed(2)}</span>
+          <button class="btn-del" onclick="event.stopPropagation();deleteOrder('${id}')" title="Eliminar">🗑️</button>
+        </div>
+      </div>`;
+
+    if(isExpanded){
+      h+=`<div class="order-card-body">`;
+      if(o.bebida)h+=`<div class="order-item"><span class="oi-emoji">🍺</span><span class="oi-label">Bebida</span><span class="oi-value">${esc(o.bebida.name)}${o.bebida.detail?" <span class='oi-detail'>"+esc(o.bebida.detail)+"</span>":""}</span></div>`;
+      if(o.entrada)h+=`<div class="order-item"><span class="oi-emoji">🥗</span><span class="oi-label">Entrada</span><span class="oi-value">${esc(o.entrada.name)}</span></div>`;
+      if(o.platoFuerte)h+=`<div class="order-item"><span class="oi-emoji">🥩</span><span class="oi-label">Plato</span><span class="oi-value">${esc(o.platoFuerte.name)}${o.guarnicion?" · "+esc(o.guarnicion):""}</span></div>`;
+      if(o.postre)h+=`<div class="order-item"><span class="oi-emoji">🍫</span><span class="oi-label">Postre</span><span class="oi-value">${esc(o.postre.name)}</span></div>`;
+      if(o.cafe)h+=`<div class="order-item"><span class="oi-emoji">☕</span><span class="oi-label">Café</span><span class="oi-value">${esc(o.cafe.name)}${o.cafe.detail?" <span class='oi-detail'>"+esc(o.cafe.detail)+"</span>":""}</span></div>`;
+      if(o.extras&&o.extras.length){
+        h+=`<div style="font-size:11px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:1px;margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">Extras</div>`;
+        o.extras.forEach((e,idx)=>{
+          const emoji=e.type==="postre"?"🍫":e.type==="cafe"?"☕":"🍺";
+          h+=`<div class="order-item extra"><span class="oi-emoji">${emoji}</span><span class="oi-value">${esc(e.name)}</span>
+            <button onclick="event.stopPropagation();removeExtra('${id}',${idx})" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:12px;margin-left:auto">✕</button></div>`;
+        });
+      }
+      h+=`</div>`;
+      h+=`<div class="order-extras-bar">
+        <button onclick="event.stopPropagation();addExtra('${id}','bebida')">+ Bebida</button>
+        <button onclick="event.stopPropagation();addExtra('${id}','postre')">+ Postre</button>
+        <button onclick="event.stopPropagation();addExtra('${id}','cafe')">+ Café</button>
+      </div>`;
+    }
+    h+=`</div>`;
+  });
+  return h;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════
+if (STATE.user) {
+  initFirebase();
+}
+render();
+</script>
+</body>
+</html>
   --text-dim: #64748b;
   --text-faint: #475569;
   --amber: #f59e0b;
