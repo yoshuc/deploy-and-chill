@@ -1218,17 +1218,26 @@ function renderOrdersView(){
 }
 
 function renderCocinaTab(entries){
-  const groups={bebida:{},entrada:{},platoFuerte:{},guarnicion:{},postre:{},cafe:{}};
+  const groups={bebida:{},entrada:{},platoFuerte:{},postre:{},cafe:{}};
   entries.forEach(([id,o])=>{
-    ["bebida","entrada","platoFuerte","postre","cafe"].forEach(k=>{
+    ["bebida","entrada","postre","cafe"].forEach(k=>{
       if(o[k]){const n=o[k].name+(o[k].detail?" ("+o[k].detail+")":"");groups[k][n]=(groups[k][n]||0)+1}
     });
-    if(o.guarnicion){groups.guarnicion[o.guarnicion]=(groups.guarnicion[o.guarnicion]||0)+1}
+    // Plato fuerte + guarnición juntos
+    if(o.platoFuerte){
+      const n=o.platoFuerte.name+(o.guarnicion?" · "+o.guarnicion:"");
+      groups.platoFuerte[n]=(groups.platoFuerte[n]||0)+1;
+    }
     if(o.extras)o.extras.forEach(e=>{const k=e.type||"bebida";const n=e.name+(e.detail?" ("+e.detail+")":"");groups[k][n]=(groups[k][n]||0)+1});
   });
 
-  const labels={bebida:"Bebidas",entrada:"Entradas",platoFuerte:"Platos Fuertes",guarnicion:"Guarniciones",postre:"Postres",cafe:"Cafés"};
-  let h="";
+  const labels={bebida:"Bebidas",entrada:"Entradas",platoFuerte:"Platos Fuertes + Guarnición",postre:"Postres",cafe:"Cafés"};
+  let h=`<button onclick="exportPDF()" style="width:100%;padding:12px;border-radius:10px;border:1px solid var(--amber);
+    background:var(--amber-dim);color:var(--amber);font-size:13px;font-weight:700;cursor:pointer;font-family:var(--sans);
+    margin-bottom:16px;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1v9M5 7l3 3 3-3M3 12v2h10v-2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Exportar PDF para restaurante</button>`;
+
   Object.entries(labels).forEach(([k,label])=>{
     const items=Object.entries(groups[k]).sort((a,b)=>b[1]-a[1]);
     if(!items.length)return;
@@ -1238,6 +1247,109 @@ function renderCocinaTab(entries){
     });
   });
   return h;
+}
+
+function exportPDF(){
+  const entries=Object.entries(STATE.orders).sort((a,b)=>(a[1].name||"").localeCompare(b[1].name||""));
+  if(!entries.length){alert("No hay órdenes para exportar");return}
+
+  // Build groups for summary
+  const groups={bebida:{},entrada:{},platoFuerte:{},postre:{},cafe:{}};
+  entries.forEach(([id,o])=>{
+    ["bebida","entrada","postre","cafe"].forEach(k=>{
+      if(o[k]){const n=o[k].name+(o[k].detail?" ("+o[k].detail+")":"");groups[k][n]=(groups[k][n]||0)+1}
+    });
+    if(o.platoFuerte){const n=o.platoFuerte.name+(o.guarnicion?" · "+o.guarnicion:"");groups.platoFuerte[n]=(groups.platoFuerte[n]||0)+1}
+    if(o.extras)o.extras.forEach(e=>{const k=e.type||"bebida";const n=e.name+(e.detail?" ("+e.detail+")":"");groups[k][n]=(groups[k][n]||0)+1});
+  });
+
+  // Build totals
+  let subtotalMenu=0,subtotalExtras=0;
+  entries.forEach(([id,o])=>{
+    let base=0;
+    if(o.bebida)base+=o.bebida.price||0;if(o.entrada)base+=o.entrada.price||0;
+    if(o.platoFuerte)base+=o.platoFuerte.price||0;if(o.postre)base+=o.postre.price||0;
+    if(o.cafe)base+=o.cafe.price||0;subtotalMenu+=base;
+    if(o.extras)o.extras.forEach(e=>subtotalExtras+=e.price||0);
+  });
+  const subtotal=subtotalMenu+subtotalExtras;
+  const servicio=subtotal*0.12;
+  const total=subtotal+servicio;
+
+  const groupLabels={bebida:"Bebidas",entrada:"Entradas",platoFuerte:"Platos Fuertes + Guarnición",postre:"Postres",cafe:"Cafés"};
+
+  let summaryHTML="";
+  Object.entries(groupLabels).forEach(([k,label])=>{
+    const items=Object.entries(groups[k]).sort((a,b)=>b[1]-a[1]);
+    if(!items.length)return;
+    summaryHTML+=`<h3 style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#64748b;margin:16px 0 8px;border-bottom:1px solid #e2e8f0;padding-bottom:4px">${label}</h3>`;
+    items.forEach(([name,count])=>{
+      summaryHTML+=`<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:13px"><span>${name}</span><strong>${count}</strong></div>`;
+    });
+  });
+
+  let detailHTML="";
+  entries.forEach(([id,o],idx)=>{
+    detailHTML+=`<div style="margin-bottom:16px;padding:12px 16px;border:1px solid #e2e8f0;border-radius:8px;page-break-inside:avoid">
+      <div style="font-size:14px;font-weight:700;margin-bottom:8px;color:#0f172a">${String(idx+1).padStart(2,"0")}. ${o.name||"Sin nombre"}</div>`;
+    const lines=[];
+    if(o.bebida)lines.push("🍺 "+o.bebida.name+(o.bebida.detail?" ("+o.bebida.detail+")":""));
+    if(o.entrada)lines.push("🥗 "+o.entrada.name);
+    else lines.push("🥗 Sin entrada");
+    if(o.platoFuerte)lines.push("🥩 "+o.platoFuerte.name+(o.guarnicion?" · "+o.guarnicion:""));
+    if(o.postre)lines.push("🍫 "+o.postre.name);
+    else lines.push("🍫 Sin postre");
+    if(o.cafe)lines.push("☕ "+o.cafe.name+(o.cafe.detail?" · "+o.cafe.detail:""));
+    else lines.push("☕ Sin café");
+    if(o.extras&&o.extras.length){
+      o.extras.forEach(e=>{
+        const emoji=e.type==="postre"?"🍫":e.type==="cafe"?"☕":"🍺";
+        lines.push(emoji+" "+e.name+(e.detail?" ("+e.detail+")":"")+" [extra]");
+      });
+    }
+    lines.forEach(l=>{detailHTML+=`<div style="font-size:12px;color:#334155;padding:2px 0;padding-left:16px">${l}</div>`});
+    detailHTML+=`</div>`;
+  });
+
+  const w=window.open("","_blank");
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Deploy & Chill — Orden Don Emiliano</title>
+    <style>@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
+    *{margin:0;padding:0;box-sizing:border-box}body{font-family:'DM Sans',sans-serif;padding:32px;color:#1e293b;max-width:800px;margin:0 auto}
+    @media print{body{padding:16px}h1{font-size:18px!important}.no-print{display:none!important}}</style></head><body>
+
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;border-bottom:3px solid #f59e0b;padding-bottom:16px">
+      <div><h1 style="font-size:22px;font-weight:800;color:#0f172a">Don Emiliano — Orden del evento</h1>
+        <p style="font-size:13px;color:#64748b;margin-top:4px">Deploy & Chill · Jueves 4 de junio 2026 · ${entries.length} personas</p>
+        <p style="font-size:13px;color:#64748b">Affinity Marketing International</p></div>
+      <button class="no-print" onclick="window.print()" style="padding:10px 20px;border-radius:8px;border:none;background:#f59e0b;color:#0f172a;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans'">Imprimir / Guardar PDF</button>
+    </div>
+
+    <h2 style="font-size:16px;font-weight:800;color:#0f172a;margin-bottom:4px">Resumen de cantidades</h2>
+    <p style="font-size:12px;color:#64748b;margin-bottom:12px">Para preparación en cocina</p>
+    ${summaryHTML}
+
+    <div style="margin:24px 0;border-top:2px solid #e2e8f0"></div>
+
+    <h2 style="font-size:16px;font-weight:800;color:#0f172a;margin-bottom:4px">Detalle por persona</h2>
+    <p style="font-size:12px;color:#64748b;margin-bottom:12px">Para servicio en mesa</p>
+    ${detailHTML}
+
+    <div style="margin:24px 0;border-top:2px solid #e2e8f0"></div>
+
+    <div style="max-width:350px;margin-left:auto">
+      <h2 style="font-size:16px;font-weight:800;color:#0f172a;margin-bottom:12px">Cuenta</h2>
+      <div style="display:flex;justify-content:space-between;padding:4px 0;font-size:13px"><span>Subtotal menú (${entries.length} personas)</span><span style="font-family:'JetBrains Mono'">Q${subtotalMenu.toFixed(2)}</span></div>
+      ${subtotalExtras>0?`<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:13px"><span>Extras</span><span style="font-family:'JetBrains Mono'">Q${subtotalExtras.toFixed(2)}</span></div>`:""}
+      <div style="display:flex;justify-content:space-between;padding:4px 0;font-size:13px"><span>Subtotal</span><span style="font-family:'JetBrains Mono'">Q${subtotal.toFixed(2)}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:4px 0;font-size:13px"><span>12% Servicio</span><span style="font-family:'JetBrains Mono'">Q${servicio.toFixed(2)}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:12px 0 0;margin-top:8px;border-top:2px solid #f59e0b;font-size:18px;font-weight:800"><span>TOTAL</span><span style="font-family:'JetBrains Mono'">Q${total.toFixed(2)}</span></div>
+    </div>
+
+    <div style="margin-top:32px;text-align:center;font-size:11px;color:#94a3b8">
+      Deploy & Chill 2026 · Affinity Marketing International · Generado el ${new Date().toLocaleDateString("es",{day:"numeric",month:"long",year:"numeric",hour:"2-digit",minute:"2-digit"})}
+    </div>
+  </body></html>`);
+  w.document.close();
 }
 
 function renderPersonaTab(entries){
