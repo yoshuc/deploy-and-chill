@@ -1042,9 +1042,11 @@ function toggleBudget() {
 // ═══════════════════════════════════════════════════════════════
 const EXTRA_ITEMS = {
   bebida: [
-    {name:"Limonada",price:19.50},{name:"Naranjada",price:19.50},{name:"Gaseosa",price:15.50},
-    {name:"Cerveza Nacional",price:28.50},{name:"Cerveza Importada",price:32.50},
-    {name:"El Príncipe Gris",price:38.50},{name:"El Zapote",price:35.50},
+    {name:"Limonada",price:19.50},{name:"Naranjada",price:19.50},{name:"Gaseosa",price:15.50,hasInput:true,inputPlaceholder:"¿Cuál?"},
+    {name:"Cerveza Nacional",price:28.50,hasInput:true,inputPlaceholder:"¿Cuál? (Gallo, Montecarlo, Dorada)"},
+    {name:"Cerveza Importada",price:32.50,hasInput:true,inputPlaceholder:"¿Cuál? (Stella, Corona, Modelo)"},
+    {name:"El Príncipe Gris",price:38.50,hasInput:true,inputPlaceholder:"¿IPL o Pilsner Lager?"},
+    {name:"El Zapote",price:35.50,hasInput:true,inputPlaceholder:"¿Cuál estilo?"},
     {name:"Copa de Vino Tinto",price:44.50},{name:"Copa de Vino Blanco",price:38.50},
     {name:"Copa de Vino Rosé",price:38.50},{name:"Sangría",price:39.50},
     {name:"Aperol Spritz",price:49.50},{name:"Zacapa Mojito",price:50.50},
@@ -1056,8 +1058,10 @@ const EXTRA_ITEMS = {
     {name:"Cheese Cake Sorpresa",price:65},
   ],
   cafe: [
-    {name:"Americano",price:15},{name:"Espresso",price:15},{name:"Capuchino",price:20},
-    {name:"Latte",price:20},{name:"Cortadito",price:15},
+    {name:"Americano",price:15},{name:"Espresso",price:15},
+    {name:"Capuchino",price:20,hasInput:true,inputPlaceholder:"Tipo de leche (entera, deslactosada, almendras)"},
+    {name:"Latte",price:20,hasInput:true,inputPlaceholder:"Tipo de leche (entera, deslactosada, almendras)"},
+    {name:"Cortadito",price:15},
   ]
 };
 
@@ -1068,14 +1072,27 @@ function deleteOrder(id){
   db.ref(DB_BASE+"/orders/"+id).remove();
 }
 
-function addExtra(orderId,type){STATE.addingExtra={orderId,type};render()}
+function addExtra(orderId,type){STATE.addingExtra={orderId,type,selectedItem:null,detail:""};render()}
 function cancelExtra(){STATE.addingExtra=null;render()}
+function selectExtraItem(item){
+  if(!item.hasInput){confirmExtra(STATE.addingExtra.orderId,item);return}
+  STATE.addingExtra.selectedItem=item;STATE.addingExtra.detail="";render();
+}
+function setExtraDetail(val){STATE.addingExtra.detail=val}
+function confirmSelectedExtra(){
+  const ae=STATE.addingExtra;
+  const item={...ae.selectedItem};
+  if(ae.detail)item.detail=ae.detail;
+  confirmExtra(ae.orderId,item);
+}
 
 function confirmExtra(orderId,item){
   const ref=db.ref(DB_BASE+"/orders/"+orderId+"/extras");
   ref.once("value",snap=>{
     const extras=snap.val()||[];
-    extras.push({type:item.type||STATE.addingExtra.type,name:item.name,price:item.price});
+    const entry={type:item.type||STATE.addingExtra.type,name:item.name,price:item.price};
+    if(item.detail)entry.detail=item.detail;
+    extras.push(entry);
     ref.set(extras);
     STATE.addingExtra=null;
     render();
@@ -1163,14 +1180,36 @@ function renderOrdersView(){
     const ae=STATE.addingExtra;
     const items=EXTRA_ITEMS[ae.type]||[];
     const typeLabel=ae.type==="bebida"?"Bebida":ae.type==="postre"?"Postre":"Café";
+    const selItem=ae.selectedItem;
+
     h+=`<div class="extra-modal" onclick="cancelExtra()">
       <div class="extra-modal-box" onclick="event.stopPropagation()">
-        <div class="extra-modal-title">Agregar ${typeLabel} Extra</div>
-        ${items.map(item=>`<div class="extra-modal-opt" onclick="confirmExtra('${ae.orderId}',${JSON.stringify(item).replace(/"/g,'&quot;')})">
-          <div class="option-name">${esc(item.name)}</div>
-          <div class="option-desc">Q${item.price.toFixed(2)}</div>
-        </div>`).join("")}
-        <button class="extra-modal-cancel" onclick="cancelExtra()">Cancelar</button>
+        <div class="extra-modal-title">Agregar ${typeLabel} Extra</div>`;
+
+    if(!selItem){
+      // Step 1: select item
+      h+=items.map(item=>`<div class="extra-modal-opt" onclick='selectExtraItem(${JSON.stringify(item).replace(/'/g,"&#39;")})'>
+        <div class="option-name">${esc(item.name)}</div>
+        <div class="option-desc">Q${item.price.toFixed(2)}${item.hasInput?" · requiere detalle":""}</div>
+      </div>`).join("");
+    }else{
+      // Step 2: fill detail
+      h+=`<div style="padding:12px 0">
+        <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px">${esc(selItem.name)}</div>
+        <div style="font-size:12px;color:var(--text-dim);margin-bottom:12px">Q${selItem.price.toFixed(2)}</div>
+        <input type="text" class="sub-input" style="width:100%;padding:10px 14px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text-secondary);font-size:14px;font-family:var(--sans);outline:none"
+          placeholder="${esc(selItem.inputPlaceholder||"Especifica...")}"
+          value="${esc(ae.detail)}" oninput="setExtraDetail(this.value)" autofocus>
+        <div style="display:flex;gap:8px;margin-top:12px">
+          <button style="flex:1;padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--bg-surface);color:var(--text-muted);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--sans)"
+            onclick="STATE.addingExtra.selectedItem=null;render()">← Atrás</button>
+          <button style="flex:1;padding:10px;border-radius:8px;border:none;background:var(--amber);color:var(--bg);font-size:13px;font-weight:700;cursor:pointer;font-family:var(--sans)"
+            onclick="confirmSelectedExtra()">Agregar</button>
+        </div>
+      </div>`;
+    }
+
+    h+=`<button class="extra-modal-cancel" onclick="cancelExtra()">Cancelar</button>
       </div>
     </div>`;
   }
@@ -1185,7 +1224,7 @@ function renderCocinaTab(entries){
       if(o[k]){const n=o[k].name+(o[k].detail?" ("+o[k].detail+")":"");groups[k][n]=(groups[k][n]||0)+1}
     });
     if(o.guarnicion){groups.guarnicion[o.guarnicion]=(groups.guarnicion[o.guarnicion]||0)+1}
-    if(o.extras)o.extras.forEach(e=>{const k=e.type||"bebida";const n=e.name+" (extra)";groups[k][n]=(groups[k][n]||0)+1});
+    if(o.extras)o.extras.forEach(e=>{const k=e.type||"bebida";const n=e.name+(e.detail?" ("+e.detail+")":"");groups[k][n]=(groups[k][n]||0)+1});
   });
 
   const labels={bebida:"Bebidas",entrada:"Entradas",platoFuerte:"Platos Fuertes",guarnicion:"Guarniciones",postre:"Postres",cafe:"Cafés"};
@@ -1225,7 +1264,7 @@ function renderPersonaTab(entries){
         h+=`<div style="font-size:11px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:1px;margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">Extras</div>`;
         o.extras.forEach((e,idx)=>{
           const emoji=e.type==="postre"?"🍫":e.type==="cafe"?"☕":"🍺";
-          h+=`<div class="order-item extra"><span class="oi-emoji">${emoji}</span><span class="oi-value">${esc(e.name)}</span>
+          h+=`<div class="order-item extra"><span class="oi-emoji">${emoji}</span><span class="oi-value">${esc(e.name)}${e.detail?" <span class='oi-detail'>"+esc(e.detail)+"</span>":""}</span>
             <button onclick="event.stopPropagation();removeExtra('${id}',${idx})" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:12px;margin-left:auto">✕</button></div>`;
         });
       }
