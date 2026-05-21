@@ -364,7 +364,7 @@ const TASKS = {
 
     { id:"Y-05", week:2, title:"Diseñar la invitación digital",
       due:"2026-05-16",
-      desc:"Crear imagen para WhatsApp/correo en Canva (1600×400px para header, o formato vertical para WhatsApp).\n\n<strong>Debe incluir:</strong>\n• Nombre: Deploy & Chill\n• Fecha: Jueves 4 de junio\n• Hora: 11:00 AM\n• Lugar: CC La Estación, Zona 10\n• Dress code: Casual\n• Incluye almuerzo y bebidas\n• \"Confirma tu asistencia con Audelina\"" },
+      desc:"Crear imagen para WhatsApp/correo en Canva (1600×400px para header, o formato vertical para WhatsApp).\n\n<strong>Debe incluir:</strong>\n• Nombre: Deploy & Chill\n• Fecha: Jueves 4 de junio\n• Hora: 11:00 AM\n• Lugar: Oakland Mall / Oakland Place, Zona 10\n• Dress code: Casual\n• Incluye almuerzo y bebidas\n• \"Confirma tu asistencia\"" },
 
     { id:"Y-06", week:2, title:"Crear la web app del torneo de boliche", deprecated:true,
       due:"2026-05-28",
@@ -372,15 +372,15 @@ const TASKS = {
 
     { id:"Y-07", week:2, title:"Enviar invitación oficial al equipo",
       due:"2026-05-19",
-      desc:"Canal: WhatsApp grupal + correo electrónico.\n\n<strong>Mensaje sugerido:</strong>\n\"Equipo 🚀 El próximo jueves 4 de junio tenemos un Deploy & Chill — un día fuera de código para todo el equipo GT. Incluye boliche, almuerzo premium con cortes de carne argentinos, y bebidas. Lugar: CC La Estación, Z10. Hora: 11:00 AM. Dress code: casual. Confirma tu asistencia con Audelina antes del viernes 23 de mayo.\"" },
+      desc:"Canal: WhatsApp grupal + correo electrónico.\n\n<strong>Mensaje sugerido:</strong>\n\"Equipo 🚀 El próximo jueves 4 de junio tenemos un Deploy & Chill — un día fuera de código para todo el equipo GT. Incluye boliche, almuerzo premium en Don Emiliano, y bebidas. Lugar: Oakland Mall / Oakland Place, Z10. Hora: 11:00 AM. Dress code: casual. Confirma tu asistencia antes del viernes 23 de mayo.\"" },
 
     { id:"Y-08", week:2, title:"Validar cotizaciones de Audelina",
       due:"2026-05-21",
-      desc:"Revisar las cotizaciones que Audelina consiguió de Futeca y Palermo. Verificar que los números cuadren con el presupuesto de USD $2,500. Aprobar o pedir ajustes." },
+      desc:"Revisar las cotizaciones que Audelina consiguió de 1890 Bowling y Don Emiliano. Verificar que los números cuadren con el presupuesto de USD $2,500. Aprobar o pedir ajustes." },
 
     { id:"Y-09", week:2, title:"Aprobar menú final del restaurante",
       due:"2026-05-23",
-      desc:"Revisar las opciones de menú que Audelina negoció con Palermo. Verificar que haya opciones sin azúcar. Aprobar el menú fijo." },
+      desc:"Revisar las opciones de menú que Audelina negoció con Don Emiliano. Verificar que haya opciones sin azúcar. Aprobar el menú fijo (~Q350/pp)." },
 
     // SEMANA 3
     { id:"Y-10", week:3, title:"Revisar confirmaciones de asistencia",
@@ -402,41 +402,42 @@ const TASKS = {
 
     { id:"Y-14", week:4, title:"Preparar todo la noche anterior",
       due:"2026-06-03",
-      desc:"Empacar regalos y cualquier material. Verificar que el celular tenga batería. Confirmar hora de llegada con Audelina (10:30 AM en La Estación)." },
+      desc:"Empacar regalos y cualquier material. Verificar que el celular tenga batería. Confirmar hora de llegada con Audelina (11:00 AM en Oakland Place)." },
   ],
 
   audelina: [
     // SEMANA 1
-    { id:"A-01", week:1, title:"Renegociar paquete con Futeca Bowling",
+    { id:"A-01", week:1, title:"Coordinar paquete con 1890 Bowling Oakland Place",
       due:"2026-05-12",
-      desc:"Contacto: WhatsApp +502 3758-6118\nUbicación: CC La Estación, La Terraza, 2do nivel, Zona 10\n\n<strong>Ya tenemos cotización aprobada por Q4,020.50 pero necesitamos reducir el paquete.</strong>",
-      script:"Hola, soy Audelina de Affinity Marketing. Ya tenemos una cotización aprobada con ustedes para el jueves 4 de junio. Necesitamos hacer unos ajustes al paquete: reducir a 1 hora de boliche, quitar las pizzas, y bajar de 25 a 20 cervezas. ¿Nos pueden dar un precio actualizado?",
+      desc:"Contacto: Pedro Melgar — Ejecutivo de Eventos\nUbicación: Oakland Place, 3er nivel, Zona 10\n\n<strong>Ya tenemos cotización por Q3,302.20 pero necesitamos ajustar a 1 hora y presupuesto de Q3,000.</strong>\n\nSe envió carta formal con contra-propuesta. Dar seguimiento a la respuesta de Pedro.",
+      script:"Hola Pedro, soy Audelina de Affinity Marketing. Le dimos seguimiento a la cotización que nos enviaste. ¿Ya tuviste oportunidad de revisar los ajustes que solicitamos? Necesitamos 5 pistas por 1 hora en vez de 2, y ajustar el paquete. ¿Nos puedes confirmar el precio actualizado?",
       questions:[
-        "¿Cuál sería el nuevo precio con estos cambios: 5 pistas × 1 hora, sin pizzas, mantener nachos y gaseosas, 20 cervezas en vez de 25, mantener arcade y salón?",
-        "¿Sigue aplicando el 15% de descuento por reservar en mayo?",
-        "¿Cuál sería el nuevo monto de anticipo?",
-        "¿Necesitamos firmar un contrato nuevo o se modifica el existente?",
-        "¿El alquiler de zapatos sigue incluido?",
-        "¿Permiten llevar bebidas propias (descorche)?",
-        "¿Tienen pantallas donde se pueda proyectar algo? ¿Se puede poner música propia?",
-        "¿El parqueo del centro comercial es gratuito o tiene costo?"
+        "¿Cuál es el precio final con 5 pistas × 1 hora (12:00 a 1:00 PM), 5 Loaded Nachos, 5 cubetazos Cabro/Montecarlo, con 20% descuento?",
+        "¿El anticipo del 50% aplica sobre el monto actualizado?",
+        "¿Necesitamos firmar contrato nuevo o se modifica el existente?",
+        "¿Las pistas estarán habilitadas de 12:00 PM a 1:00 PM? Llegamos a las 11:30 AM para entrega de zapatos.",
+        "¿Permiten consumo adicional de bebidas fuera del paquete, pagando directo?",
+        "¿Sigue la cortesía de cafetera y Churro Bites por reservar en mayo?",
+        "¿El parqueo de Oakland Place tiene costo?",
+        "¿Nos pueden enviar la cotización actualizada por escrito para proceder?"
       ]},
 
-    { id:"A-02", week:1, title:"Confirmar reserva con Restaurante Palermo",
+    { id:"A-02", week:1, title:"Coordinar almuerzo con Don Emiliano",
       due:"2026-05-13",
-      desc:"Contacto: Rosy García — Tel. 37713559 / 50007051\nEjecutivo de ventas: Rigoberto Herrera\nUbicación: CC La Estación, Zona 10\n\n<strong>Ya tenemos la cotización del Menú #2 por Q9,707.50 (25 personas). Necesitamos confirmar la reserva.</strong>",
-      script:"Hola Rosy, soy Audelina de Affinity Marketing. Ya recibimos la cotización del Menú #2 para el jueves 4 de junio y queremos confirmar la reserva. ¿Qué necesitan de nuestra parte para proceder?",
+      desc:"Contacto: Buscar en OpenTable o llamar directamente al restaurante\nUbicación: Rooftop Oakland Mall, Zona 10 (mismo complejo que 1890 Bowling)\n\n<strong>Necesitamos negociar menú fijo de ~Q350/pp para 25 personas.</strong>",
+      script:"Buenos días, les llamo de parte de Affinity Marketing International. Estamos organizando un almuerzo corporativo para 25 personas el jueves 4 de junio, de 1:30 PM a 4:00 PM aproximadamente. Nos gustaría negociar un menú fijo por persona que incluya entrada, plato fuerte, postre, café y una bebida. ¿Con quién puedo coordinar eventos para grupos?",
       questions:[
-        "Confirmar que la fecha (jueves 4 de junio) y el salón La Estación (montaje Imperial, 25 personas) siguen disponibles.",
-        "Confirmar el menú exacto — Menú #2: entradas (empanadas/carpaccio/sopa) + plato fuerte (Vacío 9oz, Lomito 8oz, Salmón del Sur, o Pollo al chimichurri) + postre. ¿Todos pueden elegir libremente cualquier plato fuerte?",
-        "Confirmar las 25 cervezas (Gallo/Light/Moza a Q30 c/u) y el descorche de 4 botellas de vino (Q150 c/u).",
-        "Confirmar postre sin azúcar: copa de yogurt con frutas. ¿Cuántos debemos indicar con anticipación?",
-        "¿Cuál es el monto exacto del anticipo del 40% y los datos bancarios para la transferencia o depósito?",
-        "¿Cuándo necesitan el contrato firmado y sellado?",
-        "Recordar: la hora de servir es 2:00 PM. Nosotros llegamos al salón a la 1:30 PM.",
-        "¿Podemos enviar por correo un archivo para que quede cargado en el Chromecast o TV antes de que lleguemos?",
-        "Confirmar que podemos ingresar un banner (sin adhesivos ni tachuelas, solo en atril o stand).",
-        "Nombre y contacto directo de la persona que nos atenderá el día del evento."
+        "¿Tienen disponibilidad el jueves 4 de junio de 1:30 PM a 4:00 PM para un grupo de 25 personas?",
+        "¿Pueden reservarnos un área del rooftop para el grupo?",
+        "¿Manejan menú fijo para grupos? Queremos ofrecer opciones: entrada (carpaccio, tortillas chancol, ensalada, sopa), plato fuerte (lomito, puyazo, salmón, pechugas, burger), postre y café. ¿Pueden armar un paquete de ~Q350 por persona?",
+        "El plato fuerte incluye guarnición a elegir (papas, puré, frijolitos, ensalada, papa asada). ¿Está incluido en el precio?",
+        "Bebida incluida por persona: ¿pueden incluir una cerveza, copa de vino, sangría, cóctel o refresco?",
+        "¿Manejan opciones de postre sin azúcar?",
+        "¿Cobran servicio? ¿Cuánto? (el menú dice 12%)",
+        "¿Requieren anticipo? ¿Cuánto y datos para pago?",
+        "Si confirmamos 25 pero llegan 22, ¿cómo manejan la diferencia?",
+        "¿Hasta cuándo podemos ajustar el número final de personas?",
+        "Nombre y contacto directo de la persona que nos atenderá."
       ]},
 
     { id:"A-03", week:1, title:"Backup: cotizar Arena Mediterránea (solo si Palermo no funciona)", deprecated:true,
@@ -446,7 +447,7 @@ const TASKS = {
     // SEMANA 2
     { id:"A-04", week:2, title:"Dar seguimiento a confirmaciones pendientes",
       due:"2026-05-19",
-      desc:"Verificar que ambos venues estén confirmados:\n\n• <strong>Futeca:</strong> ¿Ya recibimos el precio actualizado del paquete renegociado? Si no, llamar de nuevo.\n• <strong>Palermo:</strong> ¿Ya se firmó el contrato y se pagó el anticipo del 40%? Si no, coordinar con Yosh.\n\n<strong>No dejar pasar más de una semana sin tener ambas reservas confirmadas por escrito.</strong>" },
+      desc:"Verificar que ambos venues estén confirmados:\n\n• <strong>1890 Bowling:</strong> ¿Ya recibimos el precio actualizado? ¿Se pagó anticipo del 50%? Si no, llamar a Pedro Melgar.\n• <strong>Don Emiliano:</strong> ¿Ya se confirmó la reserva y el menú fijo? Si no, coordinar con Yosh.\n\n<strong>No dejar pasar más de una semana sin tener ambas reservas confirmadas por escrito.</strong>" },
 
     { id:"A-05", week:2, title:"Recopilar confirmaciones de asistencia del equipo",
       due:"2026-05-23",
@@ -456,48 +457,48 @@ const TASKS = {
       due:"2026-05-21",
       desc:"<strong>Solo si Yosh elige camiseta o hoodie como regalo.</strong>\n\nEnviar mensaje por WhatsApp a cada persona preguntando su talla (S, M, L, XL, XXL).\n\nConsolidar en una lista y enviar a Yosh antes del jueves 22." },
 
-    { id:"A-07", week:2, title:"Confirmar detalles finales del menú con Palermo",
+    { id:"A-07", week:2, title:"Confirmar detalles finales del menú con Don Emiliano",
       due:"2026-05-21",
-      desc:"Llamar a Rosy García (37713559) y confirmar:\n\n• Menú #2 (Q299/pp + 10% servicio) para 25 personas\n• Cantidad de personas que necesitan postre sin azúcar (copa de yogurt con frutas)\n• Hora de llegada al salón: 1:30 PM, hora de servir: 2:00 PM\n• Forma de pago del saldo restante (60%) — ¿tarjeta corporativa, transferencia, o efectivo?\n• Confirmar que el Chromecast y la TV de 96\" estarán listos\n\n<strong>Pedir confirmación por escrito de todo lo anterior.</strong>" },
+      desc:"Llamar a Don Emiliano y confirmar:\n\n• Menú fijo (~Q350/pp + 12% servicio) para 25 personas\n• Opciones de plato fuerte: Lomito 8oz, Puyazo 8oz, Salmón 6oz, Pechugas Asadas, La Clásica (burger)\n• Cantidad de personas que necesitan postre sin azúcar\n• Hora de llegada: 1:30 PM\n• Forma de pago del saldo — ¿tarjeta, transferencia, o efectivo?\n\n<strong>Pedir confirmación por escrito de todo lo anterior.</strong>" },
 
     // SEMANA 3
     { id:"A-08", week:3, title:"Confirmar reserva del boliche con headcount actualizado",
       due:"2026-05-26",
-      desc:"Llamar a Futeca y confirmar:\n\n• Cantidad de personas confirmadas hasta el momento\n• Hora de llegada (11:00 AM) y salida estimada (1:30 PM)\n• Que las pistas estén reservadas y listas\n• Confirmar qué snacks/bebidas se van a pedir\n• Preguntar si necesitan pago parcial o total antes del evento" },
+      desc:"Llamar a Pedro Melgar (1890 Bowling Oakland) y confirmar:\n\n• Cantidad de personas confirmadas hasta el momento\n• Hora de llegada (11:30 AM) e inicio de pistas (12:00 PM a 1:00 PM)\n• Que las pistas estén reservadas y listas\n• Confirmar snacks y bebidas del paquete\n• Preguntar si necesitan pago parcial o total antes del evento" },
 
     { id:"A-09", week:3, title:"Confirmar reserva del restaurante con headcount actualizado",
       due:"2026-05-26",
-      desc:"Llamar a Palermo y confirmar:\n\n• Cantidad de personas confirmadas\n• Que el área/mesa está reservada\n• Recordar las restricciones alimentarias\n• Confirmar hora de llegada (1:30 PM)" },
+      desc:"Llamar a Don Emiliano y confirmar:\n\n• Cantidad de personas confirmadas\n• Que el área en el rooftop está reservada\n• Recordar las restricciones alimentarias\n• Confirmar hora de llegada (1:30 PM)" },
 
     { id:"A-10", week:3, title:"Enviar recordatorio al equipo",
       due:"2026-05-29",
-      desc:"Enviar mensaje por WhatsApp al grupo:\n\n\"Recordatorio 🚀 El próximo jueves 4 de junio es nuestro Deploy & Chill. Nos vemos a las 11:00 AM en Futeca Bowling, La Terraza, 2do nivel de CC La Estación, Zona 10. Dress code: casual. ¡No falten!\"\n\n<strong>Incluir:</strong> Ubicación de Google Maps del centro comercial." },
+      desc:"Enviar mensaje por WhatsApp al grupo:\n\n\"Recordatorio 🚀 El próximo jueves 4 de junio es nuestro Deploy & Chill. Nos vemos a las 11:30 AM en 1890 Bowling, 3er nivel de Oakland Place, Zona 10. Dress code: casual. ¡No falten!\"\n\n<strong>Incluir:</strong> Ubicación de Google Maps de Oakland Place." },
 
     // SEMANA 4
-    { id:"A-11", week:4, title:"Confirmación final con Futeca Bowling",
+    { id:"A-11", week:4, title:"Confirmación final con 1890 Bowling",
       due:"2026-06-03",
-      desc:"Llamar y confirmar un día antes:\n\n• \"Mañana jueves 4 llegamos a las 11:00 AM, somos X personas\"\n• Que las pistas estén listas y reservadas\n• Que los snacks estén coordinados\n• Nombre de la persona que nos va a recibir\n• Confirmar forma de pago final" },
+      desc:"Llamar a Pedro Melgar un día antes:\n\n• \"Mañana jueves 4 llegamos a las 11:30 AM, somos X personas, pistas de 12:00 a 1:00 PM\"\n• Que las pistas estén listas y reservadas\n• Que los snacks y cubetazos estén coordinados\n• Nombre de la persona que nos va a recibir\n• Confirmar forma de pago final" },
 
-    { id:"A-12", week:4, title:"Confirmación final con Restaurante Palermo",
+    { id:"A-12", week:4, title:"Confirmación final con Don Emiliano",
       due:"2026-06-03",
-      desc:"Llamar y confirmar un día antes:\n\n• \"Mañana jueves 4 llegamos aprox. a la 1:30 PM, somos X personas\"\n• Confirmar menú y restricciones alimentarias\n• Confirmar que el área está reservada\n• Nombre del mesero o encargado que nos va a atender\n• Confirmar forma de pago" },
+      desc:"Llamar a Don Emiliano un día antes:\n\n• \"Mañana jueves 4 llegamos aprox. a la 1:30 PM, somos X personas\"\n• Confirmar menú fijo y restricciones alimentarias\n• Confirmar que el área del rooftop está reservada\n• Nombre del mesero o encargado que nos va a atender\n• Confirmar forma de pago" },
 
     { id:"A-13", week:4, title:"Preparar lista final de asistentes",
       due:"2026-06-03",
       desc:"Enviarle a Yosh la lista final de quiénes confirmaron que sí van.\n\nEsta lista se usa para:\n• Saber cuántos regalos llevar\n• Ajustar cantidad de comida/bebida con ambos venues" },
 
     // DIA DEL EVENTO
-    { id:"A-14", week:5, title:"Llegar temprano con Yosh a La Estación",
+    { id:"A-14", week:5, title:"Llegar temprano con Yosh a Oakland",
       due:"2026-06-04",
-      desc:"Hora: 10:30 AM\n\n• Llegar a CC La Estación\n• Subir a Futeca Bowling, ubicar al contacto, verificar pistas listas\n• Dejar regalos en lugar seguro dentro del boliche\n• Coordinar con staff dónde se sienta el grupo, dónde van los snacks\n• Bajar a verificar que la mesa en Palermo esté lista para la 1:30 PM" },
+      desc:"Hora: 11:00 AM\n\n• Llegar a Oakland Place\n• Subir a 1890 Bowling (3er nivel), ubicar a Pedro Melgar o contacto, verificar pistas listas\n• Dejar regalos en lugar seguro dentro del boliche\n• Coordinar con staff dónde se sienta el grupo, dónde van los snacks\n• Verificar que Don Emiliano (Rooftop Oakland Mall) tenga la reserva lista para la 1:30 PM" },
 
     { id:"A-15", week:5, title:"Coordinar durante el evento",
       due:"2026-06-04",
-      desc:"<strong>11:00–12:30 (Boliche):</strong>\n• Coordinar que los snacks se sirvan a tiempo\n• Asegurarse de que todos tengan zapatos\n• Estar pendiente de si falta algo\n\n<strong>13:15–16:00 (Almuerzo Palermo):</strong>\n• Coordinar con el mesero que los platos salgan en orden\n• Monitorear la cuenta de bebidas si es cuenta abierta con tope\n• Pedir la cuenta cuando Yosh indique" },
+      desc:"<strong>11:30–13:00 (1890 Bowling, Oakland Place):</strong>\n• Coordinar que los snacks se sirvan a tiempo\n• Asegurarse de que todos tengan zapatos\n• Estar pendiente de si falta algo\n\n<strong>13:30–16:00 (Don Emiliano, Rooftop Oakland Mall):</strong>\n• Coordinar con el mesero que los platos salgan en orden\n• Monitorear la cuenta de bebidas extras\n• Pedir la cuenta cuando Yosh indique" },
 
     { id:"A-16", week:5, title:"Cierre administrativo",
       due:"2026-06-05",
-      desc:"<strong>Viernes 5 de junio:</strong>\n\n• Recopilar facturas de Futeca y Palermo\n• Consolidar gasto total del evento\n• Entregar reporte de gastos a Yosh" },
+      desc:"<strong>Viernes 5 de junio:</strong>\n\n• Recopilar facturas de 1890 Bowling y Don Emiliano\n• Consolidar gasto total del evento\n• Entregar reporte de gastos a Yosh" },
   ]
 };
 
