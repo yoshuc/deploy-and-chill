@@ -193,6 +193,56 @@ body{background:var(--bg);color:var(--text-secondary);font-family:var(--sans);mi
   min-width:54px;flex-shrink:0}
 .agenda-what{color:var(--text-muted)}
 
+/* ── ORDERS VIEW ── */
+.orders-wrap{max-width:800px;margin:0 auto;padding:20px}
+.orders-subtabs{display:flex;gap:6px;margin-bottom:16px}
+.orders-subtab{padding:8px 18px;border-radius:8px;border:1px solid var(--border);font-size:13px;font-weight:600;
+cursor:pointer;background:var(--bg-card);color:var(--text-dim);transition:all .2s;font-family:var(--sans)}
+.orders-subtab.active{background:var(--amber);color:var(--bg);border-color:var(--amber)}
+.orders-group-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;
+color:var(--text-dim);padding:12px 0 8px;border-bottom:1px solid var(--border);margin-bottom:8px}
+.orders-group-row{display:flex;justify-content:space-between;padding:8px 16px;background:var(--bg-card);
+border-radius:8px;margin-bottom:4px;font-size:13px;color:var(--text-secondary)}
+.orders-group-row .count{font-family:var(--mono);font-weight:700;color:var(--amber);min-width:30px;text-align:right}
+.order-card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden}
+.order-card-header{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;
+border-bottom:1px solid #1e293b;cursor:pointer}
+.order-card-name{font-size:15px;font-weight:700;color:var(--text)}
+.order-card-actions{display:flex;gap:8px}
+.order-card-actions button{background:none;border:none;cursor:pointer;font-size:14px;padding:4px 8px;
+border-radius:6px;transition:all .2s}
+.order-card-actions .btn-del{color:var(--red)}
+.order-card-actions .btn-del:hover{background:var(--red);background:#ef444420}
+.order-card-body{padding:12px 18px}
+.order-item{display:flex;align-items:flex-start;gap:10px;padding:6px 0;font-size:13px}
+.order-item .oi-emoji{flex-shrink:0}
+.order-item .oi-label{color:var(--text-dim);min-width:70px;flex-shrink:0}
+.order-item .oi-value{color:var(--text-secondary);font-weight:500}
+.order-item .oi-detail{color:var(--text-dim);font-family:var(--mono);font-size:11px}
+.order-item.extra{color:var(--amber);font-style:italic}
+.order-item.extra .oi-value{color:var(--amber)}
+.order-extras-bar{display:flex;gap:6px;padding:10px 18px;border-top:1px solid #1e293b}
+.order-extras-bar button{padding:6px 12px;border-radius:6px;border:1px dashed var(--border);
+background:none;color:var(--text-dim);font-size:11px;font-weight:600;cursor:pointer;font-family:var(--sans);transition:all .2s}
+.order-extras-bar button:hover{border-color:var(--amber);color:var(--amber)}
+.orders-account{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:20px;margin-top:16px}
+.orders-account-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:12px}
+.orders-account-row{display:flex;justify-content:space-between;padding:6px 0;font-size:13px;color:var(--text-muted)}
+.orders-account-row.total{border-top:2px solid var(--amber);padding-top:12px;margin-top:8px;font-size:16px;
+font-weight:800;color:var(--text);font-family:var(--mono)}
+.orders-account-row .val{font-family:var(--mono);font-weight:600}
+.extra-modal{position:fixed;inset:0;background:#000a;z-index:200;display:flex;align-items:flex-end;justify-content:center}
+.extra-modal-box{background:var(--bg-card);border:1px solid var(--border);border-radius:16px 16px 0 0;
+padding:24px;width:100%;max-width:480px;max-height:70vh;overflow-y:auto}
+.extra-modal-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:12px}
+.extra-modal-opt{padding:10px 14px;border-radius:8px;border:1px solid var(--border);background:var(--bg-surface);
+margin-bottom:6px;cursor:pointer;transition:all .2s}
+.extra-modal-opt:hover{border-color:var(--amber)}
+.extra-modal-opt .option-name{font-size:14px;font-weight:600;color:var(--text-secondary)}
+.extra-modal-opt .option-desc{font-size:12px;font-family:var(--mono);color:var(--text-dim);margin-top:2px}
+.extra-modal-cancel{width:100%;padding:12px;border-radius:10px;border:none;background:var(--bg-surface);
+color:var(--text-muted);font-size:14px;font-weight:600;cursor:pointer;margin-top:10px;font-family:var(--sans)}
+
 /* ── FOOTER ── */
 .footer{max-width:800px;margin:0 auto;padding:20px;text-align:center}
 .footer p{font-size:11px;color:var(--text-faint)}
@@ -372,35 +422,31 @@ const TASKS = {
         "¿El parqueo del centro comercial es gratuito o tiene costo?"
       ]},
 
-    { id:"A-02", week:1, title:"Llamar a Restaurante Palermo — cotizar almuerzo grupal",
+    { id:"A-02", week:1, title:"Confirmar reserva con Restaurante Palermo",
       due:"2026-05-13",
-      desc:"Contacto: Tel +502 5563-8278\nUbicación: CC La Estación, Zona 10 (mismo centro comercial que el boliche)",
-      script:"Buenos días, les llamo de parte de Affinity Marketing International. Estamos organizando un almuerzo corporativo para 25 personas el jueves 4 de junio, aproximadamente de 1:30 PM a 4:00 PM. Nos interesa un menú fijo con cortes de carne. ¿Manejan eventos para grupos?",
+      desc:"Contacto: Rosy García — Tel. 37713559 / 50007051\nEjecutivo de ventas: Rigoberto Herrera\nUbicación: CC La Estación, Zona 10\n\n<strong>Ya tenemos la cotización del Menú #2 por Q9,707.50 (25 personas). Necesitamos confirmar la reserva.</strong>",
+      script:"Hola Rosy, soy Audelina de Affinity Marketing. Ya recibimos la cotización del Menú #2 para el jueves 4 de junio y queremos confirmar la reserva. ¿Qué necesitan de nuestra parte para proceder?",
       questions:[
-        "¿Tienen disponibilidad el jueves 4 de junio de 1:30 PM a 4:00 PM para 25 personas?",
-        "¿Pueden reservarnos un área separada o semi-privada? ¿O estaríamos en el salón general?",
-        "¿Manejan menú fijo para eventos? ¿Qué opciones tienen? Necesitamos cortes de carne como plato principal.",
-        "¿Pueden ofrecer 2–3 opciones de plato principal para que cada persona elija (carne, pollo, pescado)?",
-        "Tenemos personas con control de azúcar. ¿Pueden ofrecer postres sin azúcar o sustituir por fruta?",
-        "¿Cuánto cuesta el menú fijo por persona? ¿Qué incluye exactamente (entrada, plato fuerte, postre, bebida)?",
-        "¿Manejan cuenta abierta de bar? ¿Cuánto cuesta agregar bebidas alcohólicas al paquete?",
-        "¿Permiten llevar vino propio (BYO)? Si sí, ¿cuánto cobran de descorche por botella?",
-        "¿Qué cervezas manejan? ¿Tienen cerveza artesanal? ¿Precio por unidad?",
-        "¿Hay límite de tiempo para el grupo? ¿Podemos quedarnos hasta las 4:00–4:30 PM?",
-        "¿Requieren depósito? ¿Cuánto? ¿Política de cancelación?",
-        "Si confirmamos 25 pero llegan 22, ¿se cobra por los 25 o por los que asistan? ¿Hasta cuándo podemos ajustar el número?",
-        "Nombre y contacto directo de la persona que coordina eventos.",
-        "¿Se puede colocar decoración en la mesa? ¿Permiten música o bocina bluetooth?"
+        "Confirmar que la fecha (jueves 4 de junio) y el salón La Estación (montaje Imperial, 25 personas) siguen disponibles.",
+        "Confirmar el menú exacto — Menú #2: entradas (empanadas/carpaccio/sopa) + plato fuerte (Vacío 9oz, Lomito 8oz, Salmón del Sur, o Pollo al chimichurri) + postre. ¿Todos pueden elegir libremente cualquier plato fuerte?",
+        "Confirmar las 25 cervezas (Gallo/Light/Moza a Q30 c/u) y el descorche de 4 botellas de vino (Q150 c/u).",
+        "Confirmar postre sin azúcar: copa de yogurt con frutas. ¿Cuántos debemos indicar con anticipación?",
+        "¿Cuál es el monto exacto del anticipo del 40% y los datos bancarios para la transferencia o depósito?",
+        "¿Cuándo necesitan el contrato firmado y sellado?",
+        "Recordar: la hora de servir es 2:00 PM. Nosotros llegamos al salón a la 1:30 PM.",
+        "¿Podemos enviar por correo un archivo para que quede cargado en el Chromecast o TV antes de que lleguemos?",
+        "Confirmar que podemos ingresar un banner (sin adhesivos ni tachuelas, solo en atril o stand).",
+        "Nombre y contacto directo de la persona que nos atenderá el día del evento."
       ]},
 
-    { id:"A-03", week:1, title:"Backup: cotizar Arena Mediterránea (solo si Palermo no funciona)",
+    { id:"A-03", week:1, title:"Backup: cotizar Arena Mediterránea (solo si Palermo no funciona)", deprecated:true,
       due:"2026-05-14",
       desc:"<strong>Solo ejecutar si Palermo no tiene disponibilidad o Yosh lo indica.</strong>\n\nBuscar contacto en redes @arena_mediterranea o llamar a CC La Estación.\nHacer las mismas 14 preguntas del punto A-02." },
 
     // SEMANA 2
-    { id:"A-04", week:2, title:"Dar seguimiento a cotizaciones pendientes",
+    { id:"A-04", week:2, title:"Dar seguimiento a confirmaciones pendientes",
       due:"2026-05-19",
-      desc:"Si para esta fecha no han llegado las cotizaciones escritas de Futeca o Palermo, llamar de nuevo y pedir que las envíen por WhatsApp o correo.\n\n<strong>No dejar pasar más de una semana sin cotización en mano.</strong>" },
+      desc:"Verificar que ambos venues estén confirmados:\n\n• <strong>Futeca:</strong> ¿Ya recibimos el precio actualizado del paquete renegociado? Si no, llamar de nuevo.\n• <strong>Palermo:</strong> ¿Ya se firmó el contrato y se pagó el anticipo del 40%? Si no, coordinar con Yosh.\n\n<strong>No dejar pasar más de una semana sin tener ambas reservas confirmadas por escrito.</strong>" },
 
     { id:"A-05", week:2, title:"Recopilar confirmaciones de asistencia del equipo",
       due:"2026-05-23",
@@ -410,9 +456,9 @@ const TASKS = {
       due:"2026-05-21",
       desc:"<strong>Solo si Yosh elige camiseta o hoodie como regalo.</strong>\n\nEnviar mensaje por WhatsApp a cada persona preguntando su talla (S, M, L, XL, XXL).\n\nConsolidar en una lista y enviar a Yosh antes del jueves 22." },
 
-    { id:"A-07", week:2, title:"Confirmar menú final con Palermo",
+    { id:"A-07", week:2, title:"Confirmar detalles finales del menú con Palermo",
       due:"2026-05-21",
-      desc:"Una vez que Yosh apruebe la cotización, llamar a Palermo y confirmar:\n\n• Menú fijo aprobado por Yosh\n• Cantidad de personas con restricciones alimentarias\n• Hora exacta de llegada del grupo (1:30 PM)\n• Forma de pago (tarjeta corporativa, transferencia, o efectivo)\n\n<strong>Pedir confirmación por escrito de todo lo anterior.</strong>" },
+      desc:"Llamar a Rosy García (37713559) y confirmar:\n\n• Menú #2 (Q299/pp + 10% servicio) para 25 personas\n• Cantidad de personas que necesitan postre sin azúcar (copa de yogurt con frutas)\n• Hora de llegada al salón: 1:30 PM, hora de servir: 2:00 PM\n• Forma de pago del saldo restante (60%) — ¿tarjeta corporativa, transferencia, o efectivo?\n• Confirmar que el Chromecast y la TV de 96\" estarán listos\n\n<strong>Pedir confirmación por escrito de todo lo anterior.</strong>" },
 
     // SEMANA 3
     { id:"A-08", week:3, title:"Confirmar reserva del boliche con headcount actualizado",
@@ -464,25 +510,22 @@ const WEEKS = {
 };
 
 const BUDGET = [
-  ["Futeca Bowling (5 pistas × 1h, renegociado)","~Q1,785","$234"],
-  ["Palermo Menú #2 × 25 (Q299/pp)","Q7,475","$980"],
-  ["Cervezas Palermo × 25 (Q30/pp)","Q750","$98"],
-  ["Descorche vino × 4 botellas","Q600","$79"],
-  ["10% servicio Palermo","Q883","$116"],
+  ["Bowling 1890 Oakland Place","Q3,000","$393"],
+  ["Don Emiliano ~Q350/pp × 25","Q8,750","$1,147"],
+  ["12% servicio Don Emiliano","Q1,050","$138"],
   ["Regalos playera × 25 (Q100/pp)","Q2,500","$328"],
   ["Detalle extra (lapicero/llavero)","Q500","$66"],
   ["Logística / imprevistos","Q500","$66"],
 ];
 
 const AGENDA = [
-  ["10:30","Yosh y Audelina llegan, verifican todo"],
-  ["11:00","Llegada del equipo, entrega de regalos"],
-  ["11:15","Bienvenida breve + snacks y bebidas"],
-  ["11:30","Boliche libre — cada quien a su ritmo + arcade"],
-  ["12:30","Cierre del boliche, convivencia libre"],
-  ["13:00","Traslado a Palermo (mismo CC, bajar 1 nivel)"],
-  ["13:15","Llegada al salón, acomodo"],
-  ["13:30","Almuerzo — Menú #2 Palermo (cortes argentinos)"],
+  ["11:00","Yosh y Audelina llegan a Oakland, verifican todo"],
+  ["11:30","Llegada del equipo a 1890 Bowling, entrega de regalos"],
+  ["11:45","Bienvenida breve + entrega de zapatos"],
+  ["12:00","Boliche libre — 1 hora, cada quien a su ritmo"],
+  ["13:00","Fin del boliche"],
+  ["13:15","Traslado a Don Emiliano (Rooftop Oakland Mall, caminando)"],
+  ["13:30","Almuerzo — menú individual, cada quien elige"],
   ["15:00","Brindis + palabras del director"],
   ["15:30","Sobremesa y convivencia libre"],
   ["16:00","Cierre"],
@@ -501,6 +544,9 @@ let STATE = {
   pendingFiles: {},  // { taskId: [File, ...] }
   uploading: false,
   imageModal: null,
+  orders: {},
+  ordersSubTab: "cocina",
+  addingExtra: null,
 };
 
 // ═══════════════════════════════════════════════════════════════
@@ -512,6 +558,10 @@ const STORAGE_BASE = "deploy_and_chill_2026";
 function initFirebase() {
   db.ref(DB_BASE + "/tasks").on("value", snap => {
     STATE.taskData = snap.val() || {};
+    render();
+  });
+  db.ref(DB_BASE + "/orders").on("value", snap => {
+    STATE.orders = snap.val() || {};
     render();
   });
 }
@@ -700,8 +750,8 @@ function render() {
   const currentWeek = getWeekNum();
 
   // Determine visible tabs and tasks
-  const tabs = isYosh ? ["yosh","audelina"] : ["audelina"];
-  const tasks = TASKS[tab];
+  const tabs = isYosh ? ["yosh","audelina","ordenes"] : ["audelina"];
+  const tasks = tab !== "ordenes" ? TASKS[tab] : null;
   const yoshPct = pct(TASKS.yosh);
   const audelinaPct = pct(TASKS.audelina);
   const allTasks = [...TASKS.yosh, ...TASKS.audelina];
@@ -758,14 +808,20 @@ function render() {
   if (tabs.length > 1) {
     html += `<div class="tabs-wrap">`;
     tabs.forEach(t => {
-      const label = t === "yosh" ? "Yosh" : "Audelina";
-      const count = TASKS[t].filter(tk => !tk.deprecated && !taskData[tk.id]?.done).length;
+      const label = t === "yosh" ? "Yosh" : t === "audelina" ? "Audelina" : "Órdenes";
+      const count = t === "ordenes" ? Object.keys(STATE.orders).length : TASKS[t].filter(tk => !tk.deprecated && !taskData[tk.id]?.done).length;
+      const countLabel = t === "ordenes" ? count + " órdenes" : count + " pendientes";
       html += `<button class="tab-btn ${tab===t?'active':''}" onclick="switchTab('${t}')">
-        ${label}<span class="tab-count">${count} pendientes</span>
+        ${label}<span class="tab-count">${countLabel}</span>
       </button>`;
     });
     html += `</div>`;
   }
+
+  // CONTENT
+  if (tab === "ordenes") {
+    html += renderOrdersView();
+  } else {
 
   // CHECKLIST
   html += `<div class="container"><div class="checklist-wrap" style="${tabs.length<=1?'border-radius:12px':''}">`;
@@ -815,6 +871,8 @@ function render() {
 
   html += `</div></div>`;
 
+  } // end checklist else
+
   // EVENT INFO
   html += `<div class="event-info"><div class="event-card">
     <h3>Agenda del día — Jueves 4 de junio</h3>
@@ -824,15 +882,15 @@ function render() {
   // BUDGET
   html += `<div class="budget-section">
     <button class="budget-toggle" onclick="toggleBudget()">
-      Presupuesto estimado <span class="budget-total">~Q14,993 · USD $1,967</span>
+      Presupuesto estimado <span class="budget-total">~Q16,300 · USD $2,138</span>
     </button>
     <div class="budget-body ${budgetOpen?'open':''}">
       <table class="budget-table">
         <thead><tr><th>Rubro</th><th>Q</th><th>USD</th></tr></thead>
         <tbody>
           ${BUDGET.map(([r,q,u]) => `<tr><td>${esc(r)}</td><td>${q}</td><td>${u}</td></tr>`).join('')}
-          <tr><td>TOTAL ESTIMADO</td><td>~Q14,993</td><td>$1,967</td></tr>
-          <tr><td>Sobrante</td><td class="sobrante">~Q4,082</td><td class="sobrante">$535</td></tr>
+          <tr><td>TOTAL ESTIMADO</td><td>~Q16,300</td><td>$2,138</td></tr>
+          <tr><td>Sobrante</td><td class="sobrante">~Q2,775</td><td class="sobrante">$364</td></tr>
         </tbody>
       </table>
     </div>
@@ -977,6 +1035,210 @@ function toggleExpand(id) {
 function toggleBudget() {
   STATE.budgetOpen = !STATE.budgetOpen;
   render();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ORDERS
+// ═══════════════════════════════════════════════════════════════
+const EXTRA_ITEMS = {
+  bebida: [
+    {name:"Limonada",price:19.50},{name:"Naranjada",price:19.50},{name:"Gaseosa",price:15.50},
+    {name:"Cerveza Nacional",price:28.50},{name:"Cerveza Importada",price:32.50},
+    {name:"El Príncipe Gris",price:38.50},{name:"El Zapote",price:35.50},
+    {name:"Copa de Vino Tinto",price:44.50},{name:"Copa de Vino Blanco",price:38.50},
+    {name:"Copa de Vino Rosé",price:38.50},{name:"Sangría",price:39.50},
+    {name:"Aperol Spritz",price:49.50},{name:"Zacapa Mojito",price:50.50},
+    {name:"Margarita",price:48.50},{name:"Hendricks & Tonic",price:52.50},
+  ],
+  postre: [
+    {name:"Volcán de Chocolate",price:55},{name:"Tiramisú a la Naranja",price:45},
+    {name:"Dúo de Flanes",price:55},{name:"Pan de Zuccini",price:45},
+    {name:"Cheese Cake Sorpresa",price:65},
+  ],
+  cafe: [
+    {name:"Americano",price:15},{name:"Espresso",price:15},{name:"Capuchino",price:20},
+    {name:"Latte",price:20},{name:"Cortadito",price:15},
+  ]
+};
+
+function setOrdersSubTab(t){STATE.ordersSubTab=t;render()}
+
+function deleteOrder(id){
+  if(!confirm("¿Eliminar la orden de esta persona?"))return;
+  db.ref(DB_BASE+"/orders/"+id).remove();
+}
+
+function addExtra(orderId,type){STATE.addingExtra={orderId,type};render()}
+function cancelExtra(){STATE.addingExtra=null;render()}
+
+function confirmExtra(orderId,item){
+  const ref=db.ref(DB_BASE+"/orders/"+orderId+"/extras");
+  ref.once("value",snap=>{
+    const extras=snap.val()||[];
+    extras.push({type:item.type||STATE.addingExtra.type,name:item.name,price:item.price});
+    ref.set(extras);
+    STATE.addingExtra=null;
+    render();
+  });
+}
+
+function removeExtra(orderId,idx){
+  const ref=db.ref(DB_BASE+"/orders/"+orderId+"/extras");
+  ref.once("value",snap=>{
+    const extras=snap.val()||[];
+    extras.splice(idx,1);
+    ref.set(extras);
+  });
+}
+
+function orderTotal(o){
+  let t=0;
+  if(o.bebida)t+=o.bebida.price||0;
+  if(o.entrada)t+=o.entrada.price||0;
+  if(o.platoFuerte)t+=o.platoFuerte.price||0;
+  if(o.postre)t+=o.postre.price||0;
+  if(o.cafe)t+=o.cafe.price||0;
+  if(o.extras)o.extras.forEach(e=>t+=e.price||0);
+  return t;
+}
+
+function renderOrdersView(){
+  const orders=STATE.orders;
+  const entries=Object.entries(orders).sort((a,b)=>(a[1].name||"").localeCompare(b[1].name||""));
+  const subtab=STATE.ordersSubTab;
+
+  let h=`<div class="orders-wrap">`;
+  h+=`<div class="orders-subtabs">
+    <button class="orders-subtab ${subtab==="cocina"?"active":""}" onclick="setOrdersSubTab('cocina')">Resumen Cocina</button>
+    <button class="orders-subtab ${subtab==="persona"?"active":""}" onclick="setOrdersSubTab('persona')">Por Persona</button>
+  </div>`;
+
+  if(!entries.length){
+    h+=`<div style="text-align:center;padding:60px 20px;color:var(--text-dim)">
+      <div style="font-size:40px;margin-bottom:12px">🍽️</div>
+      <div style="font-size:14px">Aún no hay órdenes</div>
+      <div style="font-size:12px;margin-top:4px;color:var(--text-faint)">Las órdenes aparecerán aquí cuando el equipo las envíe desde el menú</div>
+    </div>`;
+    h+=`</div>`;return h;
+  }
+
+  if(subtab==="cocina") h+=renderCocinaTab(entries);
+  else h+=renderPersonaTab(entries);
+
+  // Account
+  let subtotalMenu=0,subtotalExtras=0;
+  entries.forEach(([id,o])=>{
+    let base=0;
+    if(o.bebida)base+=o.bebida.price||0;
+    if(o.entrada)base+=o.entrada.price||0;
+    if(o.platoFuerte)base+=o.platoFuerte.price||0;
+    if(o.postre)base+=o.postre.price||0;
+    if(o.cafe)base+=o.cafe.price||0;
+    subtotalMenu+=base;
+    if(o.extras)o.extras.forEach(e=>subtotalExtras+=e.price||0);
+  });
+  const subtotal=subtotalMenu+subtotalExtras;
+  const servicio=subtotal*0.12;
+  const total=subtotal+servicio;
+  const propina=subtotal*0.10;
+  const gran=total+propina;
+
+  h+=`<div class="orders-account">
+    <div class="orders-account-title">💰 Cuenta</div>
+    <div class="orders-account-row"><span>Subtotal menú (${entries.length} personas)</span><span class="val">Q${subtotalMenu.toFixed(2)}</span></div>
+    ${subtotalExtras>0?`<div class="orders-account-row"><span>Extras (bebidas/postres/cafés adicionales)</span><span class="val">Q${subtotalExtras.toFixed(2)}</span></div>`:""}
+    <div class="orders-account-row"><span>Subtotal</span><span class="val">Q${subtotal.toFixed(2)}</span></div>
+    <div class="orders-account-row"><span>12% Servicio</span><span class="val">Q${servicio.toFixed(2)}</span></div>
+    <div class="orders-account-row total"><span>TOTAL</span><span>Q${total.toFixed(2)}</span></div>
+    <div class="orders-account-row" style="margin-top:12px;border-top:1px solid var(--border);padding-top:8px">
+      <span style="color:var(--amber)">Propina sugerida 10%</span><span class="val" style="color:var(--amber)">Q${propina.toFixed(2)}</span>
+    </div>
+    <div class="orders-account-row total" style="border-top-color:var(--emerald)"><span style="color:var(--emerald)">GRAN TOTAL</span><span style="color:var(--emerald)">Q${gran.toFixed(2)}</span></div>
+  </div>`;
+
+  h+=`</div>`;
+
+  // Extra modal
+  if(STATE.addingExtra){
+    const ae=STATE.addingExtra;
+    const items=EXTRA_ITEMS[ae.type]||[];
+    const typeLabel=ae.type==="bebida"?"Bebida":ae.type==="postre"?"Postre":"Café";
+    h+=`<div class="extra-modal" onclick="cancelExtra()">
+      <div class="extra-modal-box" onclick="event.stopPropagation()">
+        <div class="extra-modal-title">Agregar ${typeLabel} Extra</div>
+        ${items.map(item=>`<div class="extra-modal-opt" onclick="confirmExtra('${ae.orderId}',${JSON.stringify(item).replace(/"/g,'&quot;')})">
+          <div class="option-name">${esc(item.name)}</div>
+          <div class="option-desc">Q${item.price.toFixed(2)}</div>
+        </div>`).join("")}
+        <button class="extra-modal-cancel" onclick="cancelExtra()">Cancelar</button>
+      </div>
+    </div>`;
+  }
+
+  return h;
+}
+
+function renderCocinaTab(entries){
+  const groups={bebida:{},entrada:{},platoFuerte:{},guarnicion:{},postre:{},cafe:{}};
+  entries.forEach(([id,o])=>{
+    ["bebida","entrada","platoFuerte","postre","cafe"].forEach(k=>{
+      if(o[k]){const n=o[k].name+(o[k].detail?" ("+o[k].detail+")":"");groups[k][n]=(groups[k][n]||0)+1}
+    });
+    if(o.guarnicion){groups.guarnicion[o.guarnicion]=(groups.guarnicion[o.guarnicion]||0)+1}
+    if(o.extras)o.extras.forEach(e=>{const k=e.type||"bebida";const n=e.name+" (extra)";groups[k][n]=(groups[k][n]||0)+1});
+  });
+
+  const labels={bebida:"Bebidas",entrada:"Entradas",platoFuerte:"Platos Fuertes",guarnicion:"Guarniciones",postre:"Postres",cafe:"Cafés"};
+  let h="";
+  Object.entries(labels).forEach(([k,label])=>{
+    const items=Object.entries(groups[k]).sort((a,b)=>b[1]-a[1]);
+    if(!items.length)return;
+    h+=`<div class="orders-group-title">${label}</div>`;
+    items.forEach(([name,count])=>{
+      h+=`<div class="orders-group-row"><span>${esc(name)}</span><span class="count">${count}</span></div>`;
+    });
+  });
+  return h;
+}
+
+function renderPersonaTab(entries){
+  let h="";
+  entries.forEach(([id,o])=>{
+    const isExpanded=STATE.expanded["order_"+id];
+    h+=`<div class="order-card">
+      <div class="order-card-header" onclick="STATE.expanded['order_${id}']=!STATE.expanded['order_${id}'];render()">
+        <span class="order-card-name">${esc(o.name||"Sin nombre")}</span>
+        <div class="order-card-actions">
+          <span style="font-size:12px;font-family:var(--mono);color:var(--text-dim)">Q${orderTotal(o).toFixed(2)}</span>
+          <button class="btn-del" onclick="event.stopPropagation();deleteOrder('${id}')" title="Eliminar">🗑️</button>
+        </div>
+      </div>`;
+
+    if(isExpanded){
+      h+=`<div class="order-card-body">`;
+      if(o.bebida)h+=`<div class="order-item"><span class="oi-emoji">🍺</span><span class="oi-label">Bebida</span><span class="oi-value">${esc(o.bebida.name)}${o.bebida.detail?" <span class='oi-detail'>"+esc(o.bebida.detail)+"</span>":""}</span></div>`;
+      if(o.entrada)h+=`<div class="order-item"><span class="oi-emoji">🥗</span><span class="oi-label">Entrada</span><span class="oi-value">${esc(o.entrada.name)}</span></div>`;
+      if(o.platoFuerte)h+=`<div class="order-item"><span class="oi-emoji">🥩</span><span class="oi-label">Plato</span><span class="oi-value">${esc(o.platoFuerte.name)}${o.guarnicion?" · "+esc(o.guarnicion):""}</span></div>`;
+      if(o.postre)h+=`<div class="order-item"><span class="oi-emoji">🍫</span><span class="oi-label">Postre</span><span class="oi-value">${esc(o.postre.name)}</span></div>`;
+      if(o.cafe)h+=`<div class="order-item"><span class="oi-emoji">☕</span><span class="oi-label">Café</span><span class="oi-value">${esc(o.cafe.name)}${o.cafe.detail?" <span class='oi-detail'>"+esc(o.cafe.detail)+"</span>":""}</span></div>`;
+      if(o.extras&&o.extras.length){
+        h+=`<div style="font-size:11px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:1px;margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">Extras</div>`;
+        o.extras.forEach((e,idx)=>{
+          const emoji=e.type==="postre"?"🍫":e.type==="cafe"?"☕":"🍺";
+          h+=`<div class="order-item extra"><span class="oi-emoji">${emoji}</span><span class="oi-value">${esc(e.name)}</span>
+            <button onclick="event.stopPropagation();removeExtra('${id}',${idx})" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:12px;margin-left:auto">✕</button></div>`;
+        });
+      }
+      h+=`</div>`;
+      h+=`<div class="order-extras-bar">
+        <button onclick="event.stopPropagation();addExtra('${id}','bebida')">+ Bebida</button>
+        <button onclick="event.stopPropagation();addExtra('${id}','postre')">+ Postre</button>
+        <button onclick="event.stopPropagation();addExtra('${id}','cafe')">+ Café</button>
+      </div>`;
+    }
+    h+=`</div>`;
+  });
+  return h;
 }
 
 // ═══════════════════════════════════════════════════════════════
